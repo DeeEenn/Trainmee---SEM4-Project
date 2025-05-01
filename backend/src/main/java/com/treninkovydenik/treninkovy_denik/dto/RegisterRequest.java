@@ -1,5 +1,7 @@
 package com.treninkovydenik.treninkovy_denik.dto;
-public class LoginRequest {
+public class RegisterRequest {
+    public String name;
+    public String surname;
     public String email;
     public String password;
 }

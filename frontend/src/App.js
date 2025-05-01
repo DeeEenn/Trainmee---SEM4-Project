@@ -1,33 +1,40 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Training from './pages/Training';
-import Progress from './pages/Progress';
-import Login from './components/Login';
-import Register from './components/Register';
-import TrainingDetail from './components/training/TrainingDetail';
-import EditTraining from './components/training/EditTraining';
-import ExerciseCategories from './components/exercises/ExerciseCategories';
-import Goals from './components/goals/Goals';
-
+import React, { useState } from "react";
+import AuthForm from "./components/AuthForm";
+import Navbar from "./components/Navbar";
 function App() {
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/training" element={<Training />} />
-        <Route path="/training/:id" element={<TrainingDetail />} />
-        <Route path="/progress" element={<Progress />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/exercises" element={<ExerciseCategories />} />
-        <Route path="/training/:id/edit" element={<EditTraining />} />
-        <Route path="/goals" element={<Goals />} />
-      </Routes>
-    </div>
-  );
+    const [isAuthenticated, setIsAuthenticated] = useState(
+        !!localStorage.getItem("token")
+    );
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+    };
+
+    return (
+
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+            {isAuthenticated ? (
+                <div>
+                    <Navbar />
+                <div className="text-center">
+                    <h1 className="text-3xl font-bold mb-6">
+                        Vítej v tréninkovém deníku 💪
+                    </h1>
+                    <button
+                        onClick={handleLogout}
+                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    >
+                        Odhlásit se
+                    </button>
+                </div>
+                </div>
+            ) : (
+                <AuthForm onAuthSuccess={() => setIsAuthenticated(true)} />
+            )}
+        </div>
+
+    );
 }
 
 export default App;
