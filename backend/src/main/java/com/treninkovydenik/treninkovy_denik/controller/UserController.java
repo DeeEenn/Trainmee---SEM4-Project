@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -45,6 +43,40 @@ public class UserController {
             return ResponseEntity.ok(userProfile);
         } catch (Exception e) {
             logger.error("Error in getProfile: ", e);
+            throw e;
+        }
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(@RequestBody UserProfileDto profileDto) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            logger.info("Authentication: {}", authentication);
+            
+            String email = authentication.getName();
+            logger.info("User email from authentication: {}", email);
+            
+            User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+            logger.info("Found user: {}", user);
+
+            // Aktualizace dat uživatele - email se nemění
+            user.setName(profileDto.getName());
+            user.setSurname(profileDto.getSurname());
+            
+            user = userRepository.save(user);
+            logger.info("Updated user: {}", user);
+            
+            UserProfileDto updatedProfile = new UserProfileDto(
+                user.getName(),
+                user.getSurname(),
+                user.getEmail() // Vracíme původní email
+            );
+            logger.info("Returning updated profile: {}", updatedProfile);
+            
+            return ResponseEntity.ok(updatedProfile);
+        } catch (Exception e) {
+            logger.error("Error in updateProfile: ", e);
             throw e;
         }
     }

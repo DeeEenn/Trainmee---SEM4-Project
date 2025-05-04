@@ -10,12 +10,13 @@ import com.treninkovydenik.treninkovy_denik.model.User;
 import com.treninkovydenik.treninkovy_denik.service.AuthService;
 import com.treninkovydenik.treninkovy_denik.dto.RegisterRequest;
 import com.treninkovydenik.treninkovy_denik.dto.LoginRequest;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
     @Autowired
     private AuthService authService;
 

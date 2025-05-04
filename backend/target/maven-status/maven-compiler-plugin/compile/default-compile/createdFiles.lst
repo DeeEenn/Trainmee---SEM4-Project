@@ -1,11 +1,10 @@
-com/treninkovydenik/treninkovy_denik/config/SecurityConfig.class
-com/treninkovydenik/treninkovy_denik/dto/LoginRequest.class
-com/treninkovydenik/treninkovy_denik/security/JwtAuthenticationFilter.class
 com/treninkovydenik/treninkovy_denik/dto/UserProfileDto.class
-com/treninkovydenik/treninkovy_denik/service/AuthService.class
 com/treninkovydenik/treninkovy_denik/dto/RegisterRequest.class
 com/treninkovydenik/treninkovy_denik/model/User.class
 com/treninkovydenik/treninkovy_denik/controller/AuthController.class
 com/treninkovydenik/treninkovy_denik/repository/UserRepository.class
 com/treninkovydenik/treninkovy_denik/TreninkovyDenikApplication.class
+com/treninkovydenik/treninkovy_denik/config/SecurityConfig.class
+com/treninkovydenik/treninkovy_denik/dto/LoginRequest.class
+com/treninkovydenik/treninkovy_denik/service/AuthService.class
 com/treninkovydenik/treninkovy_denik/controller/UserController.class

@@ -1,11 +1,15 @@
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/TreninkovyDenikApplication.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/config/SecurityConfig.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/controller/AuthController.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/controller/TrainingController.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/controller/UserController.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/LoginRequest.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/RegisterRequest.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/TrainingDTO.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/UserProfileDto.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/model/Training.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/model/User.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/repository/TrainingRepository.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/repository/UserRepository.java
-/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/security/JwtAuthenticationFilter.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/service/AuthService.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/service/TrainingService.java
