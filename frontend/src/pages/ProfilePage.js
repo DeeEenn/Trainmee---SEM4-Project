@@ -6,7 +6,10 @@ const ProfilePage = () => {
     const [formData, setFormData] = useState({
         name: '',
         surname: '',
-        email: ''
+        email: '',
+        bodyFatPercentage: '',
+        weight: '',
+        height: ''
     });
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
@@ -32,7 +35,7 @@ const ProfilePage = () => {
             setLoading(true);
             const headers = getAuthHeader();
             if (!headers) {
-                setError('You are not logged in');
+                setError("Není přihlášen");
                 setLoading(false);
                 return;
             }
@@ -55,7 +58,7 @@ const ProfilePage = () => {
             }
 
             if (!response.ok) {
-                throw new Error('Failed to fetch user data');
+                throw new Error('Nepodařilo se načíst data');
             }
 
             const data = await response.json();
@@ -63,12 +66,15 @@ const ProfilePage = () => {
             setFormData({
                 name: data.name,
                 surname: data.surname,
-                email: data.email
+                email: data.email,
+                bodyFatPercentage: data.bodyFatPercentage || '',
+                weight: data.weight || '',
+                height: data.height || ''
             });
             setError(null);
-        } catch (err) {
-            setError(`Error fetching user data: ${err.message}`);
-            console.error('Error:', err);
+        } catch (error) {
+            setError(error.message);
+            console.error('Error:', error);
         } finally {
             setLoading(false);
         }
@@ -219,6 +225,48 @@ const ProfilePage = () => {
                         <p className="mt-1 text-sm text-gray-500">Cannot change email</p>
                     </div>
 
+                    <div>
+                        <label htmlFor="bodyFatPercentage" className="block text-sm font-medium text-gray-700">
+                            Body Fat Percentage
+                        </label>
+                        <input
+                            type="number"
+                            id="bodyFatPercentage"
+                            name="bodyFatPercentage"
+                            value={formData.bodyFatPercentage}
+                            onChange={handleChange}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="weight" className="block text-sm font-medium text-gray-700">
+                            Weight
+                        </label>
+                        <input
+                            type="number"
+                            id="weight"
+                            name="weight"
+                            value={formData.weight}
+                            onChange={handleChange}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="height" className="block text-sm font-medium text-gray-700">
+                            Height
+                        </label>
+                        <input
+                            type="number"
+                            id="height"
+                            name="height"
+                            value={formData.height}
+                            onChange={handleChange}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        />
+                    </div>
+
                     <div className="flex space-x-4">
                         <button
                             type="submit"
@@ -233,7 +281,10 @@ const ProfilePage = () => {
                                 setFormData({
                                     name: userData.name,
                                     surname: userData.surname,
-                                    email: userData.email
+                                    email: userData.email,
+                                    bodyFatPercentage: userData.bodyFatPercentage || '',
+                                    weight: userData.weight || '',
+                                    height: userData.height || ''
                                 });
                             }}
                             className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
@@ -255,6 +306,18 @@ const ProfilePage = () => {
                     <div className="flex items-center">
                         <span className="font-semibold w-32">Email:</span>
                         <span>{userData.email}</span>
+                    </div>
+                    <div className="flex items-center">
+                        <span className="font-semibold w-32">Body Fat Percentage:</span>
+                        <span>{userData.bodyFatPercentage || 'Není zadáno'}</span>
+                    </div>
+                    <div className="flex items-center">
+                        <span className="font-semibold w-32">Weight:</span>
+                        <span>{userData.weight || 'Není zadáno'} kg</span>
+                    </div>
+                    <div className="flex items-center">
+                        <span className="font-semibold w-32">Height:</span>
+                        <span>{userData.height || 'Není zadáno'} cm</span>
                     </div>
                 </div>
             )}

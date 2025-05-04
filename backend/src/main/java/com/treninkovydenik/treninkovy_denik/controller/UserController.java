@@ -36,7 +36,10 @@ public class UserController {
             UserProfileDto userProfile = new UserProfileDto(
                 user.getName(),
                 user.getSurname(),
-                user.getEmail()
+                user.getEmail(),
+                user.getBodyFatPercentage(),
+                user.getWeight(),
+                user.getHeight()
             );
             logger.info("Returning user profile: {}", userProfile);
                 
@@ -63,6 +66,9 @@ public class UserController {
             // Aktualizace dat uživatele - email se nemění
             user.setName(profileDto.getName());
             user.setSurname(profileDto.getSurname());
+            user.setBodyFatPercentage(profileDto.getBodyFatPercentage());
+            user.setWeight(profileDto.getWeight());
+            user.setHeight(profileDto.getHeight());
             
             user = userRepository.save(user);
             logger.info("Updated user: {}", user);
@@ -70,7 +76,10 @@ public class UserController {
             UserProfileDto updatedProfile = new UserProfileDto(
                 user.getName(),
                 user.getSurname(),
-                user.getEmail() // Vracíme původní email
+                user.getEmail(),
+                user.getBodyFatPercentage(),
+                user.getWeight(),
+                user.getHeight()
             );
             logger.info("Returning updated profile: {}", updatedProfile);
             

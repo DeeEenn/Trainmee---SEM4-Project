@@ -28,6 +28,15 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    @Column
+    private Double bodyFatPercentage;
+
+    @Column
+    private Double weight;
+
+    @Column
+    private Double height;
+
     public void setName(String name) {
         this.name = name;
     }
@@ -46,6 +55,18 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public void setBodyFatPercentage(Double bodyFatPercentage) {
+        this.bodyFatPercentage = bodyFatPercentage;
+    }
+
+    public void setWeight(Double weight) {
+        this.weight = weight;
+    }
+
+    public void setHeight(Double height) {
+        this.height = height;
     }
 
     public Long getId() {
@@ -70,6 +91,18 @@ public class User {
 
     public String getRole() {
         return role;
+    }
+
+    public Double getBodyFatPercentage() {
+        return bodyFatPercentage;
+    }
+
+    public Double getWeight() {
+        return weight;
+    }
+
+    public Double getHeight() {
+        return height;
     }
 }
 
