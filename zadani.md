@@ -16,7 +16,7 @@ React, TailwindCSS
 Technologie použité databáze (1-3 body):
 Postgres (+ ORM)
 Předpokládané modelové třídy:
-Uzivatel, trenink, cvik, pokrok(kontroluje progress uzivatelu)
+Uzivatel, trenink, cvik, pokrok(kontroluje progress uzivatelu), trener
 
 Popis fungování výsledné aplikace (4-8 řádky):
 Uživatelé budou moct si zaznamenávat své tréninky, přidávat cviky na jednotlivé partie a kontrolovat svůj pokrok.   

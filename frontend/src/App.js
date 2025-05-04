@@ -4,13 +4,14 @@ import ProfilePage from "./pages/ProfilePage"; // vytvoř si tuto komponentu
 import AuthForm from "./components/AuthForm";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import TrainingPage from "./pages/TrainingPage";
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(
-        !!sessionStorage.getItem("token")
+        !!localStorage.getItem("token")
     );
 
     const handleLogout = () => {
-        sessionStorage.removeItem("token");
+        localStorage.removeItem("token");
         setIsAuthenticated(false);
     };
 
@@ -43,6 +44,7 @@ function App() {
                                     }
                                 />
                                 <Route path="/profile" element={<ProfilePage />} />
+                                <Route path="/training" element={<TrainingPage />} />
                                 {/* další route jako /training, /goals atd. */}
                             </Routes>
                         </div>
