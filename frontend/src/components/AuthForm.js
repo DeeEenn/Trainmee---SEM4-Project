@@ -10,6 +10,7 @@ const AuthForm = ({ onAuthSuccess }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
         const endpoint =
             mode === "login" ? "/api/auth/login" : "/api/auth/register";
 
@@ -18,25 +19,35 @@ const AuthForm = ({ onAuthSuccess }) => {
                 ? { email, password }
                 : { name, surname, email, password };
 
-        const res = await fetch(`http://localhost:8080${endpoint}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        });
+        try {
+            const res = await fetch(`http://localhost:8080${endpoint}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
 
-        if (res.ok) {
             const data = await res.json();
-            localStorage.setItem("token", data.token);
-            onAuthSuccess();
-        } else {
-            setError("Chyba přihlášení nebo registrace.");
+
+            if (res.ok) {
+                if (mode === "login" && data.token) {
+                    sessionStorage.setItem("token", data.token);
+                    onAuthSuccess();
+                } else if (mode === "register") {
+                    setMode("login");
+                    setError("Registrace úspěšná. Nyní se můžete přihlásit.");
+                }
+            } else {
+                setError(data.message || "Chyba při přihlášení nebo registraci");
+            }
+        } catch (err) {
+            setError("Chyba při komunikaci se serverem");
         }
     };
 
     return (
         <div className="max-w-md mx-auto mt-10 bg-white shadow-md p-6 rounded-xl">
             <h2 className="text-2xl font-bold mb-4 text-center">
-                {mode === "login" ? "Přihlášení" : "Registrace"}
+                {mode === "login" ? "Login" : "Register"}
             </h2>
 
             {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -46,14 +57,14 @@ const AuthForm = ({ onAuthSuccess }) => {
                     <>
                         <input
                             className="w-full mb-3 p-2 border rounded"
-                            placeholder="Jméno"
+                            placeholder="Name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
                         />
                         <input
                             className="w-full mb-3 p-2 border rounded"
-                            placeholder="Příjmení"
+                            placeholder="Surname"
                             value={surname}
                             onChange={(e) => setSurname(e.target.value)}
                             required
@@ -71,7 +82,7 @@ const AuthForm = ({ onAuthSuccess }) => {
                 <input
                     className="w-full mb-3 p-2 border rounded"
                     type="password"
-                    placeholder="Heslo"
+                    placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -80,29 +91,29 @@ const AuthForm = ({ onAuthSuccess }) => {
                     className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
                     type="submit"
                 >
-                    {mode === "login" ? "Přihlásit se" : "Registrovat se"}
+                    {mode === "login" ? "Login" : "Register"}
                 </button>
             </form>
 
             <div className="mt-4 text-center text-sm">
                 {mode === "login" ? (
                     <>
-                        Nemáte účet?{" "}
+                        You don't have an account?{" "}
                         <button
                             className="text-blue-600 hover:underline"
                             onClick={() => setMode("register")}
                         >
-                            Zaregistrujte se
+                            Register
                         </button>
                     </>
                 ) : (
                     <>
-                        Máte účet?{" "}
+                        Do you have an account?{" "}
                         <button
                             className="text-blue-600 hover:underline"
                             onClick={() => setMode("login")}
                         >
-                            Přihlaste se
+                            Login
                         </button>
                     </>
                 )}
