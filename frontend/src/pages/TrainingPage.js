@@ -1,59 +1,104 @@
 import React, { useState, useEffect } from 'react';
 import TrainingForm from '../components/TrainingForm';
 import TrainingList from '../components/TrainingList';
+import ExerciseForm from '../components/ExerciseForm';
+import ExerciseList from '../components/ExerciseList';
 
 const TrainingPage = () => {
     const [trainings, setTrainings] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
     const [isAdding, setIsAdding] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [selectedTraining, setSelectedTraining] = useState(null);
+    const [isAddingExercise, setIsAddingExercise] = useState(false);
+    const [exercises, setExercises] = useState([]);
 
     const getAuthHeader = () => {
         const token = localStorage.getItem('token');
         if (!token) {
-            throw new Error('You are not logged in');
+            return null;
         }
         return {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         };
     };
-    
+
     useEffect(() => {
-        loadTrainings();
+        fetchTrainings();
     }, []);
 
-    const loadTrainings = async () => {
+    useEffect(() => {
+        if (selectedTraining) {
+            fetchExercises(selectedTraining.id);
+        }
+    }, [selectedTraining]);
+
+    const fetchTrainings = async () => {
         try {
             const headers = getAuthHeader();
+            if (!headers) {
+                setError('Není přihlášen');
+                return;
+            }
+
             const response = await fetch('http://localhost:8080/api/trainings', {
                 headers: headers
             });
-            
-            if (response.status === 401) {
-                setError('Invalid token, please log in again');
-                localStorage.removeItem('token');
-                return;
-            }
-            
-            if (response.status === 403) {
-                setError('You are not authorized to perform this action');
-                return;
-            }
-            
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error('Nepodařilo se načíst tréninky');
             }
-            
+
             const data = await response.json();
             setTrainings(data);
             setError(null);
-        } catch (err) {
-            setError(`Error fetching trainings: ${err.message}`);
-            console.error('Error:', err);
+        } catch (error) {
+            setError(error.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchExercises = async (trainingId) => {
+        try {
+            const headers = getAuthHeader();
+            const response = await fetch(`http://localhost:8080/api/trainings/${trainingId}/exercises`, {
+                headers: headers
+            });
+
+            if (!response.ok) {
+                throw new Error('Nepodařilo se načíst cvičení');
+            }
+
+            const data = await response.json();
+            setExercises(data);
+        } catch (error) {
+            setError(error.message);
+        }
+    };
+
+    const handleAddExercise = async (exerciseData) => {
+        try {
+            const headers = getAuthHeader();
+            const response = await fetch(`http://localhost:8080/api/trainings/${selectedTraining.id}/exercises`, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(exerciseData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Nepodařilo se přidat cvičení');
+            }
+
+            const newExercise = await response.json();
+            setExercises([...exercises, newExercise]);
+            setIsAddingExercise(false);
+            setSuccess('Cvičení přidáno');
+            setTimeout(() => setSuccess(''), 3000);
+        } catch (error) {
+            setError(error.message);
         }
     };
 
@@ -186,12 +231,12 @@ const TrainingPage = () => {
     return (
         <div className="max-w-4xl mx-auto mt-10 p-6">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-montserrat">My Trainings</h2>
+                <h2 className="text-2xl font-montserrat">Moje tréninky</h2>
                 <button
                     onClick={() => setIsAdding(true)}
                     className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
                 >
-                    Add New Training
+                    Přidat trénink
                 </button>
             </div>
 
@@ -213,11 +258,44 @@ const TrainingPage = () => {
                     onCancel={() => setIsAdding(false)}
                 />
             ) : (
-                <TrainingList 
-                    trainings={trainings}
-                    onDeleteTraining={handleDeleteTraining}
-                    onUpdateTraining={handleUpdateTraining}
-                />
+                <div className="grid grid-cols-2 gap-8">
+                    <div>
+                        <TrainingList 
+                            trainings={trainings}
+                            onDeleteTraining={handleDeleteTraining}
+                            onUpdateTraining={handleUpdateTraining}
+                            onSelectTraining={setSelectedTraining}
+                            selectedTrainingId={selectedTraining?.id}
+                        />
+                    </div>
+                    <div>
+                        {selectedTraining ? (
+                            <div>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-xl font-semibold">Exercise</h3>
+                                    <button
+                                        onClick={() => setIsAddingExercise(true)}
+                                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                                    >
+                                        Add exercise
+                                    </button>
+                                </div>
+                                {isAddingExercise ? (
+                                    <ExerciseForm
+                                        onAddExercise={handleAddExercise}
+                                        onCancel={() => setIsAddingExercise(false)}
+                                    />
+                                ) : (
+                                    <ExerciseList exercises={exercises} />
+                                )}
+                            </div>
+                        ) : (
+                            <div className="text-center text-gray-500 py-8">
+                                <p>Select a training to view exercises</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             )}
         </div>
     );

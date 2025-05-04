@@ -9,6 +9,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "trainings")
@@ -29,6 +33,9 @@ public class Training {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "training", cascade = CascadeType.ALL)
+    private List<Exercise> exercises = new ArrayList<>();
     
 
     public Long getId() {
@@ -69,5 +76,13 @@ public class Training {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Exercise> getExercises() {
+        return exercises;
+    }
+
+    public void setExercises(List<Exercise> exercises) {
+        this.exercises = exercises;
     }
 }

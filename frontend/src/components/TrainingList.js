@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TrainingForm from './TrainingForm';
 
-const TrainingList = ({ trainings, onDeleteTraining, onUpdateTraining }) => {
+const TrainingList = ({ trainings, onDeleteTraining, onUpdateTraining, onSelectTraining, selectedTrainingId }) => {
     const [editingTraining, setEditingTraining] = useState(null);
 
     const handleEdit = (training) => {
@@ -15,9 +15,9 @@ const TrainingList = ({ trainings, onDeleteTraining, onUpdateTraining }) => {
     if (trainings.length === 0) {
         return (
             <div className="text-center text-gray-500 py-8">
-                <p className="text-lg font-montserrat">You have not added any trainings yet.</p>
+                <p className="text-lg font-montserrat">You don't have any trainings yet.</p>
             </div>
-        )
+        );
     }
 
     return (
@@ -25,7 +25,10 @@ const TrainingList = ({ trainings, onDeleteTraining, onUpdateTraining }) => {
             {trainings.map(training => (
                 <div 
                     key={training.id} 
-                    className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                    className={`bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer ${
+                        selectedTrainingId === training.id ? 'ring-2 ring-indigo-500' : ''
+                    }`}
+                    onClick={() => onSelectTraining(training)}
                 >
                     {editingTraining?.id === training.id ? (
                         <TrainingForm 
@@ -50,15 +53,21 @@ const TrainingList = ({ trainings, onDeleteTraining, onUpdateTraining }) => {
                                 <div className="flex space-x-2">
                                     <button 
                                         className="text-indigo-600 hover:text-indigo-800"
-                                        onClick={() => handleEdit(training)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEdit(training);
+                                        }}
                                     >
                                         Edit
                                     </button>
                                     <button 
                                         className="text-red-600 hover:text-red-800"
-                                        onClick={() => onDeleteTraining(training.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onDeleteTraining(training.id);
+                                        }}
                                     >
-                                        Remove
+                                        Delete
                                     </button>
                                 </div>
                             </div>

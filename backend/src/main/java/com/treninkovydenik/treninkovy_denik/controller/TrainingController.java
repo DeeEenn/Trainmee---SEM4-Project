@@ -10,7 +10,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
+import com.treninkovydenik.treninkovy_denik.model.Exercise;
+import com.treninkovydenik.treninkovy_denik.dto.ExerciseDto;
+import com.treninkovydenik.treninkovy_denik.dto.ExerciseResponseDto;
+import com.treninkovydenik.treninkovy_denik.dto.TrainingResponseDto;
 @RestController
 @RequestMapping("/api/trainings")
 public class TrainingController {
@@ -29,33 +32,52 @@ public class TrainingController {
     }
 
     @PostMapping
-    public ResponseEntity<Training> createTraining(@RequestBody TrainingDTO trainingDTO, Authentication authentication) {
+    public ResponseEntity<TrainingResponseDto> createTraining(@RequestBody TrainingDTO trainingDTO, Authentication authentication) {
         User user = getUserFromAuthentication(authentication);
-        Training training = trainingService.createTraining(trainingDTO, user);
+        TrainingResponseDto training = trainingService.createTraining(trainingDTO, user);
         return ResponseEntity.ok(training);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Training>> getUserTrainings(Authentication authentication) {
+    @PostMapping("/{trainingId}/exercises")
+    public ResponseEntity<ExerciseResponseDto> addExercise(
+            @PathVariable Long trainingId,
+            @RequestBody ExerciseDto exerciseDto,
+            Authentication authentication) {
         User user = getUserFromAuthentication(authentication);
-        List<Training> trainings = trainingService.getUserTrainings(user);
+        ExerciseResponseDto exercise = trainingService.addExerciseToTraining(trainingId, exerciseDto, user);
+        return ResponseEntity.ok(exercise);
+    }
+
+    @GetMapping("/{trainingId}/exercises")
+    public ResponseEntity<List<ExerciseResponseDto>> getExercises(
+            @PathVariable Long trainingId,
+            Authentication authentication) {
+        User user = getUserFromAuthentication(authentication);
+        List<ExerciseResponseDto> exercises = trainingService.getExercisesForTraining(trainingId, user);
+        return ResponseEntity.ok(exercises);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TrainingResponseDto>> getUserTrainings(Authentication authentication) {
+        User user = getUserFromAuthentication(authentication);
+        List<TrainingResponseDto> trainings = trainingService.getUserTrainings(user);
         return ResponseEntity.ok(trainings);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Training> getTraining(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<TrainingResponseDto> getTraining(@PathVariable Long id, Authentication authentication) {
         User user = getUserFromAuthentication(authentication);
-        Training training = trainingService.getTrainingById(id, user);
+        TrainingResponseDto training = trainingService.getTrainingById(id, user);
         return ResponseEntity.ok(training);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Training> updateTraining(
+    public ResponseEntity<TrainingResponseDto> updateTraining(
             @PathVariable Long id,
             @RequestBody TrainingDTO trainingDTO,
             Authentication authentication) {
         User user = getUserFromAuthentication(authentication);
-        Training training = trainingService.updateTraining(id, trainingDTO, user);
+        TrainingResponseDto training = trainingService.updateTraining(id, trainingDTO, user);
         return ResponseEntity.ok(training);
     }
 

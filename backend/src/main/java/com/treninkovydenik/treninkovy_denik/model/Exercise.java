@@ -1,11 +1,40 @@
-package com.treninkovydenik.treninkovy_denik.dto;
+package com.treninkovydenik.treninkovy_denik.model;
 
-public class ExerciseDto {
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "exercises")
+public class Exercise {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column
     private String description;
+
+    @Column(nullable = false)
     private String bodyPart;
+
+    @Column
     private Integer sets;
+
+    @Column
     private Integer reps;
+
+    @ManyToOne
+    @JoinColumn(name = "training_id", nullable = false)
+    private Training training;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -46,4 +75,12 @@ public class ExerciseDto {
     public void setReps(Integer reps) {
         this.reps = reps;
     }
-} 
+
+    public Training getTraining() {
+        return training;
+    }
+
+    public void setTraining(Training training) {
+        this.training = training;
+    }
+}
