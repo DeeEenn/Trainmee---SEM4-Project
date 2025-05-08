@@ -1,304 +1,507 @@
 import React, { useState, useEffect } from 'react';
-import TrainingForm from '../components/TrainingForm';
-import TrainingList from '../components/TrainingList';
-import ExerciseForm from '../components/ExerciseForm';
-import ExerciseList from '../components/ExerciseList';
+import { trainingService } from '../services/api';
 
 const TrainingPage = () => {
-    const [trainings, setTrainings] = useState([]);
-    const [isAdding, setIsAdding] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [selectedTraining, setSelectedTraining] = useState(null);
-    const [isAddingExercise, setIsAddingExercise] = useState(false);
-    const [exercises, setExercises] = useState([]);
+  const [trainings, setTrainings] = useState([]);
+  const [selectedTraining, setSelectedTraining] = useState(null);
+  const [exercises, setExercises] = useState([]);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isAddingExercise, setIsAddingExercise] = useState(false);
+  const [newExercise, setNewExercise] = useState({
+    name: '',
+    sets: '',
+    reps: '',
+    weight: '',
+    description: '',
+    bodyPart: 'LEGS'
+  });
+  const [isAddingTraining, setIsAddingTraining] = useState(false);
+  const [newTraining, setNewTraining] = useState({
+    name: '',
+    date: new Date().toISOString().split('T')[0],
+    description: ''
+  });
+  const [selectedBodyPart, setSelectedBodyPart] = useState('ALL');
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [trainingExercises, setTrainingExercises] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
-    const getAuthHeader = () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            return null;
-        }
-        return {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        };
-    };
+  const bodyPartLabels = {
+    'LEGS': 'Nohy',
+    'CHEST': 'Prsa',
+    'BACK': 'Záda',
+    'SHOULDERS': 'Ramena',
+    'ARMS': 'Ruce',
+    'ABS': 'Břicho'
+  };
 
-    useEffect(() => {
-        fetchTrainings();
-    }, []);
+  useEffect(() => {
+    loadTrainings();
+  }, []);
 
-    useEffect(() => {
-        if (selectedTraining) {
-            fetchExercises(selectedTraining.id);
-        }
-    }, [selectedTraining]);
+  const loadTrainings = async () => {
+    try {
+      const response = await trainingService.getAll();
+      setTrainings(response.data);
+      const exercisesPromises = response.data.map(training => 
+        trainingService.getExercises(training.id)
+          .then(res => ({ id: training.id, exercises: res.data }))
+          .catch(() => ({ id: training.id, exercises: [] }))
+      );
+      const exercisesResults = await Promise.all(exercisesPromises);
+      const exercisesMap = exercisesResults.reduce((acc, { id, exercises }) => {
+        acc[id] = exercises;
+        return acc;
+      }, {});
+      setTrainingExercises(exercisesMap);
+    } catch (error) {
+      setError('Nepodařilo se načíst tréninky');
+    }
+  };
 
-    const fetchTrainings = async () => {
-        try {
-            const headers = getAuthHeader();
-            if (!headers) {
-                setError('Není přihlášen');
-                return;
-            }
+  const handleTrainingSelect = async (trainingId) => {
+    try {
+      const response = await trainingService.getExercises(trainingId);
+      setExercises(response.data);
+      setSelectedTraining(trainings.find(t => t.id === trainingId));
+    } catch (error) {
+      setError('Nepodařilo se načíst cvičení');
+    }
+  };
 
-            const response = await fetch('http://localhost:8080/api/trainings', {
-                headers: headers
-            });
+  const handleAddExercise = async (e) => {
+    e.preventDefault();
+    try {
+      const exerciseData = {
+        ...newExercise,
+        description: newExercise.description || ''
+      };
+      
+      const response = await trainingService.addExercise(selectedTraining.id, exerciseData);
+      setExercises(prev => [...prev, response.data]);
+      setTrainingExercises(prev => ({
+        ...prev,
+        [selectedTraining.id]: [...(prev[selectedTraining.id] || []), response.data]
+      }));
+      setNewExercise({ name: '', sets: '', reps: '', weight: '', description: '', bodyPart: 'LEGS' });
+      setIsAddingExercise(false);
+      setSuccessMessage('Cvičení bylo úspěšně přidáno');
+    } catch (error) {
+      console.error('Chyba při přidávání cvičení:', error.response?.data || error.message);
+      setError(error.response?.data?.message || 'Nepodařilo se přidat cvičení');
+    }
+  };
 
-            if (!response.ok) {
-                throw new Error('Nepodařilo se načíst tréninky');
-            }
+  const handleDeleteTraining = async (id) => {
+    try {
+      await trainingService.delete(id);
+      setTrainings(prev => prev.filter(t => t.id !== id));
+      if (selectedTraining?.id === id) {
+        setSelectedTraining(null);
+        setExercises([]);
+      }
+      setTrainingExercises(prev => {
+        const newMap = { ...prev };
+        delete newMap[id];
+        return newMap;
+      });
+      setSuccessMessage('Trénink byl úspěšně smazán');
+    } catch (error) {
+      setError('Nepodařilo se smazat trénink');
+    }
+  };
 
-            const data = await response.json();
-            setTrainings(data);
-            setError(null);
-        } catch (error) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const handleDeleteAllTrainings = async () => {
+    try {
+      const deletePromises = trainings.map(training => trainingService.delete(training.id));
+      await Promise.all(deletePromises);
+      setTrainings([]);
+      setSelectedTraining(null);
+      setExercises([]);
+      setTrainingExercises({});
+      setSuccessMessage('Všechny tréninky byly úspěšně smazány');
+      setIsDeletingAll(false);
+    } catch (error) {
+      setError('Nepodařilo se smazat všechny tréninky');
+    }
+  };
 
-    const fetchExercises = async (trainingId) => {
-        try {
-            const headers = getAuthHeader();
-            const response = await fetch(`http://localhost:8080/api/trainings/${trainingId}/exercises`, {
-                headers: headers
-            });
+  const handleAddTraining = async (e) => {
+    e.preventDefault();
+    try {
+      const trainingData = {
+        ...newTraining,
+        date: new Date(newTraining.date + 'T00:00:00').toISOString()
+      };
+      
+      const response = await trainingService.create(trainingData);
+      setTrainings(prev => [...prev, response.data]);
+      setNewTraining({ name: '', date: new Date().toISOString().split('T')[0], description: '' });
+      setIsAddingTraining(false);
+      setSuccessMessage('Trénink byl úspěšně přidán');
+    } catch (error) {
+      console.error('Chyba při přidávání tréninku:', error.response?.data || error.message);
+      setError(error.response?.data?.message || 'Nepodařilo se přidat trénink');
+    }
+  };
 
-            if (!response.ok) {
-                throw new Error('Nepodařilo se načíst cvičení');
-            }
-
-            const data = await response.json();
-            setExercises(data);
-        } catch (error) {
-            setError(error.message);
-        }
-    };
-
-    const handleAddExercise = async (exerciseData) => {
-        try {
-            const headers = getAuthHeader();
-            const response = await fetch(`http://localhost:8080/api/trainings/${selectedTraining.id}/exercises`, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(exerciseData)
-            });
-
-            if (!response.ok) {
-                throw new Error('Nepodařilo se přidat cvičení');
-            }
-
-            const newExercise = await response.json();
-            setExercises([...exercises, newExercise]);
-            setIsAddingExercise(false);
-            setSuccess('Cvičení přidáno');
-            setTimeout(() => setSuccess(''), 3000);
-        } catch (error) {
-            setError(error.message);
-        }
-    };
-
-    const handleAddTraining = async (training) => {
-        try {
-            const headers = getAuthHeader();
-            if (!headers) {
-                setError('You are not logged in');
-                return;
-            }
-
-            const response = await fetch('http://localhost:8080/api/trainings', {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(training)
-            });
-
-            if (response.status === 401) {
-                setError('Invalid token, please log in again');
-                localStorage.removeItem('token');
-                return;
-            }
-
-            if (response.status === 403) {
-                setError('You are not authorized to perform this action');
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to add training');
-            }
-
-            const newTraining = await response.json();
-            setTrainings([...trainings, newTraining]);
-            setIsAdding(false);
-            setSuccess('Training added successfully');
-            setTimeout(() => setSuccess(''), 3000);
-            setError(null);
-        } catch (err) {
-            setError(`Error adding training: ${err.message}`);
-            console.error('Error:', err);
-        }
-    };
-
-    const handleUpdateTraining = async (id, trainingData) => {
-        try {
-            const headers = getAuthHeader();
-            if (!headers) {
-                setError('You are not logged in');
-                return;
-            }
-
-            const response = await fetch(`http://localhost:8080/api/trainings/${id}`, {
-                method: 'PUT',
-                headers: headers,
-                body: JSON.stringify(trainingData)
-            });
-
-            if (response.status === 401) {
-                setError('Invalid token, please log in again');
-                localStorage.removeItem('token');
-                return;
-            }
-
-            if (response.status === 403) {
-                setError('You are not authorized to perform this action');
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to update training');
-            }
-
-            const updatedTraining = await response.json();
-            setTrainings(trainings.map(t => 
-                t.id === id ? updatedTraining : t
-            ));
-            setSuccess('Training updated successfully');
-            setTimeout(() => setSuccess(''), 3000);
-            setError(null);
-        } catch (err) {
-            setError(`Error updating training: ${err.message}`);
-            console.error('Error:', err);
-        }
-    };
-
-    const handleDeleteTraining = async (id) => {
-        try {
-            const headers = getAuthHeader();
-            const response = await fetch(`http://localhost:8080/api/trainings/${id}`, {
-                method: 'DELETE',
-                headers: headers
-            });
-            
-            if (response.status === 401) {
-                    setError('Invalid token, please log in again');
-                localStorage.removeItem('token');
-                return;
-            }
-            
-            if (response.status === 403) {
-                setError('You are not authorized to perform this action');
-                return;
-            }
-            
-            if (!response.ok) {
-                throw new Error('Failed to delete training');
-            }
-            
-            setTrainings(trainings.filter(training => training.id !== id));
-            setError(null);
-        } catch (error) {
-            setError(error.message);
-            console.error(error);
-        }
-    };
-
-    if(loading) {
-        return <div className="text-center py-4">Loading...</div>;
+  const filteredTrainings = trainings.filter(training => {
+    if (selectedBodyPart !== 'ALL') {
+      const exercises = trainingExercises[training.id] || [];
+      if (!exercises.some(exercise => exercise.bodyPart === selectedBodyPart)) {
+        return false;
+      }
     }
 
-    if(error) {
-        return (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                {error}
-            </div>
-        );
+    if (searchTerm) {
+      if (!training.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return false;
+      }
     }
 
-    return (
-        <div className="max-w-4xl mx-auto mt-10 p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-montserrat">Moje tréninky</h2>
+    return true;
+  });
+
+  const totalPages = Math.ceil(filteredTrainings.length / itemsPerPage);
+  const paginatedTrainings = filteredTrainings.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto mt-10 p-6">
+      <h1 className="text-2xl font-bold mb-6">Tréninky</h1>
+      
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+      {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <div className="flex flex-col gap-4 mb-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Seznam tréninků</h2>
+              {trainings.length > 0 && (
                 <button
-                    onClick={() => setIsAdding(true)}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                  onClick={() => setIsDeletingAll(true)}
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                 >
-                    Přidat trénink
+                  Smazat vše
                 </button>
+              )}
             </div>
-
-            {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    {error}
-                </div>
-            )}
-
-            {success && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                    {success}
-                </div>
-            )}
-
-            {isAdding ? (
-                <TrainingForm 
-                    onAddTraining={handleAddTraining}
-                    onCancel={() => setIsAdding(false)}
+            
+            <div className="flex gap-2">
+              <select
+                value={selectedBodyPart}
+                onChange={(e) => {
+                  setSelectedBodyPart(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="p-2 border rounded flex-1"
+              >
+                <option value="ALL">Všechny části těla</option>
+                <option value="LEGS">Nohy</option>
+                <option value="CHEST">Prsa</option>
+                <option value="BACK">Záda</option>
+                <option value="SHOULDERS">Ramena</option>
+                <option value="ARMS">Ruce</option>
+                <option value="ABS">Břicho</option>
+              </select>
+              
+              <input
+                type="text"
+                placeholder="Hledat trénink..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="p-2 border rounded flex-1"
+              />
+            </div>
+          </div>
+          
+          {!isAddingTraining ? (
+            <button
+              onClick={() => setIsAddingTraining(true)}
+              className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Přidat trénink
+            </button>
+          ) : (
+            <form onSubmit={handleAddTraining} className="mb-4 p-4 border rounded">
+              <div className="grid grid-cols-1 gap-4">
+                <input
+                  type="text"
+                  placeholder="Název tréninku"
+                  value={newTraining.name}
+                  onChange={(e) => setNewTraining(prev => ({ ...prev, name: e.target.value }))}
+                  className="p-2 border rounded"
+                  required
                 />
-            ) : (
-                <div className="grid grid-cols-2 gap-8">
-                    <div>
-                        <TrainingList 
-                            trainings={trainings}
-                            onDeleteTraining={handleDeleteTraining}
-                            onUpdateTraining={handleUpdateTraining}
-                            onSelectTraining={setSelectedTraining}
-                            selectedTrainingId={selectedTraining?.id}
-                        />
-                    </div>
-                    <div>
-                        {selectedTraining ? (
-                            <div>
-                                <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-xl font-semibold">Exercise</h3>
-                                    <button
-                                        onClick={() => setIsAddingExercise(true)}
-                                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                                    >
-                                        Add exercise
-                                    </button>
-                                </div>
-                                {isAddingExercise ? (
-                                    <ExerciseForm
-                                        onAddExercise={handleAddExercise}
-                                        onCancel={() => setIsAddingExercise(false)}
-                                    />
-                                ) : (
-                                    <ExerciseList exercises={exercises} />
-                                )}
-                            </div>
-                        ) : (
-                            <div className="text-center text-gray-500 py-8">
-                                <p>Select a training to view exercises</p>
-                            </div>
-                        )}
-                    </div>
+                <input
+                  type="date"
+                  value={newTraining.date}
+                  onChange={(e) => setNewTraining(prev => ({ ...prev, date: e.target.value }))}
+                  className="p-2 border rounded"
+                  required
+                />
+                <textarea
+                  placeholder="Popis"
+                  value={newTraining.description}
+                  onChange={(e) => setNewTraining(prev => ({ ...prev, description: e.target.value }))}
+                  className="p-2 border rounded"
+                />
+              </div>
+              <div className="mt-2 flex gap-2">
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                  Přidat
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsAddingTraining(false)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                >
+                  Zrušit
+                </button>
+              </div>
+            </form>
+          )}
+          
+          <div className="space-y-4">
+            {paginatedTrainings.map(training => (
+              <div
+                key={training.id}
+                className={`p-4 border rounded-lg cursor-pointer ${
+                  selectedTraining?.id === training.id ? 'bg-blue-50' : ''
+                }`}
+                onClick={() => handleTrainingSelect(training.id)}
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h3 className="font-semibold">{training.name}</h3>
+                    <p className="text-sm text-gray-600">{new Date(training.date).toLocaleDateString()}</p>
+                    {training.description && (
+                      <p className="mt-2 text-gray-700">{training.description}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteTraining(training.id);
+                    }}
+                    className="text-red-500 hover:text-red-700 ml-4"
+                  >
+                    Smazat
+                  </button>
                 </div>
-            )}
+              </div>
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-4">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded ${
+                  currentPage === 1
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                Předchozí
+              </button>
+              
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index + 1}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === index + 1
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 hover:bg-gray-300'
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded ${
+                  currentPage === totalPages
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                Další
+              </button>
+            </div>
+          )}
         </div>
-    );
+
+        {selectedTraining && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4">
+              Cvičení pro {selectedTraining.name}
+            </h2>
+            
+            {!isAddingExercise ? (
+              <button
+                onClick={() => setIsAddingExercise(true)}
+                className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                Přidat cvičení
+              </button>
+            ) : (
+              <form onSubmit={handleAddExercise} className="mb-4 p-4 border rounded">
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Název cvičení"
+                    value={newExercise.name}
+                    onChange={(e) => setNewExercise(prev => ({
+                      ...prev,
+                      name: e.target.value
+                    }))}
+                    className="p-2 border rounded"
+                    required
+                  />
+                  <select
+                    value={newExercise.bodyPart}
+                    onChange={(e) => setNewExercise(prev => ({
+                      ...prev,
+                      bodyPart: e.target.value
+                    }))}
+                    className="p-2 border rounded"
+                    required
+                  >
+                    <option value="LEGS">Nohy</option>
+                    <option value="CHEST">Prsa</option>
+                    <option value="BACK">Záda</option>
+                    <option value="SHOULDERS">Ramena</option>
+                    <option value="ARMS">Ruce</option>
+                    <option value="ABS">Břicho</option>
+                  </select>
+                  <input
+                    type="number"
+                    placeholder="Počet sérií"
+                    value={newExercise.sets}
+                    onChange={(e) => setNewExercise(prev => ({
+                      ...prev,
+                      sets: e.target.value
+                    }))}
+                    className="p-2 border rounded"
+                    required
+                  />
+                  <input
+                    type="number"
+                    placeholder="Počet opakování"
+                    value={newExercise.reps}
+                    onChange={(e) => setNewExercise(prev => ({
+                      ...prev,
+                      reps: e.target.value
+                    }))}
+                    className="p-2 border rounded"
+                    required
+                  />
+                  <input
+                    type="number"
+                    placeholder="Váha (kg)"
+                    value={newExercise.weight}
+                    onChange={(e) => setNewExercise(prev => ({
+                      ...prev,
+                      weight: e.target.value
+                    }))}
+                    className="p-2 border rounded"
+                    required
+                  />
+                  <textarea
+                    placeholder="Popis"
+                    value={newExercise.description}
+                    onChange={(e) => setNewExercise(prev => ({
+                      ...prev,
+                      description: e.target.value
+                    }))}
+                    className="p-2 border rounded"
+                  />
+                </div>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="submit"
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  >
+                    Přidat
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingExercise(false)}
+                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                  >
+                    Zrušit
+                  </button>
+                </div>
+              </form>
+            )}
+
+            <div className="space-y-4">
+              {exercises.map(exercise => (
+                <div key={exercise.id} className="p-4 border rounded-lg">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold">{exercise.name}</h3>
+                      <p className="text-sm text-gray-600">Část těla: {bodyPartLabels[exercise.bodyPart] || exercise.bodyPart}</p>
+                      <p>Série: {exercise.sets}</p>
+                      <p>Opakování: {exercise.reps}</p>
+                      <p>Váha: {exercise.weight} kg</p>
+                      {exercise.description && (
+                        <p className="mt-2 text-gray-700">{exercise.description}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {isDeletingAll && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg">
+            <h3 className="text-xl font-semibold mb-4">Smazat všechny tréninky?</h3>
+            <p className="mb-4">Tato akce je nevratná.</p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleDeleteAllTrainings}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              >
+                Ano, smazat vše
+              </button>
+              <button
+                onClick={() => setIsDeletingAll(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Zrušit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default TrainingPage;

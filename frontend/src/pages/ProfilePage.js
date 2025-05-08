@@ -1,328 +1,191 @@
 import React, { useState, useEffect } from 'react';
+import { userService } from '../services/api';
 
 const ProfilePage = () => {
-    const [userData, setUserData] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState({
-        name: '',
-        surname: '',
-        email: '',
-        bodyFatPercentage: '',
-        weight: '',
-        height: ''
-    });
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
-    const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    surname: '',
+    email: '',
+    height: '',
+    weight: '',
+    bodyFatPercentage: ''
+  });
 
-    const getAuthHeader = () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            return null;
-        }
-        return {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        };
-    };
+  useEffect(() => {
+    loadUserProfile();
+  }, []);
 
-    useEffect(() => {
-        fetchUserData();
-    }, []);
-
-    const fetchUserData = async () => {
-        try {
-            setLoading(true);
-            const headers = getAuthHeader();
-            if (!headers) {
-                setError("Není přihlášen");
-                setLoading(false);
-                return;
-            }
-
-            const response = await fetch('http://localhost:8080/api/users/profile', {
-                headers: headers
-            });
-
-            if (response.status === 401) {
-                setError('Invalid token, please log in again');
-                localStorage.removeItem('token');
-                setLoading(false);
-                return;
-            }
-
-            if (response.status === 403) {
-                setError('You are not authorized to perform this action');
-                setLoading(false);
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error('Nepodařilo se načíst data');
-            }
-
-            const data = await response.json();
-            setUserData(data);
-            setFormData({
-                name: data.name,
-                surname: data.surname,
-                email: data.email,
-                bodyFatPercentage: data.bodyFatPercentage || '',
-                weight: data.weight || '',
-                height: data.height || ''
-            });
-            setError(null);
-        } catch (error) {
-            setError(error.message);
-            console.error('Error:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const headers = getAuthHeader();
-            if (!headers) {
-                setError('You are not logged in');
-                return;
-            }
-
-            const response = await fetch('http://localhost:8080/api/users/profile', {
-                method: 'PUT',
-                headers: headers,
-                body: JSON.stringify(formData)
-            });
-
-            if (response.status === 401) {
-                setError('Invalid token, please log in again');
-                localStorage.removeItem('token');
-                return;
-            }
-
-            if (response.status === 403) {
-                setError('You are not authorized to perform this action');
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to update profile');
-            }
-
-            const data = await response.json();
-            setUserData(data);
-            setIsEditing(false);
-            setSuccess('Profile updated successfully');
-            setTimeout(() => setSuccess(''), 3000);
-            setError(null);
-        } catch (err) {
-            setError(`Error updating profile: ${err.message}`);
-            console.error('Error:', err);
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading profile...</p>
-                </div>
-            </div>
-        );
+  const loadUserProfile = async () => {
+    try {
+      const response = await userService.getProfile();
+      setUserData(response.data);
+      setFormData({
+        name: response.data.name || '',
+        surname: response.data.surname || '',
+        email: response.data.email || '',
+        height: response.data.height || '',
+        weight: response.data.weight || '',
+        bodyFatPercentage: response.data.bodyFatPercentage || ''
+      });
+    } catch (error) {
+      setError('Nepodařilo se načíst profil');
     }
+  };
 
-    if (!userData) {
-        return (
-            <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-                <div className="text-center text-red-600">
-                    {error || 'Failed to load profile data'}
-                </div>
-            </div>
-        );
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await userService.updateProfile(formData);
+      setUserData(response.data);
+      setIsEditing(false);
+      setSuccessMessage('Profil byl úspěšně aktualizován');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      setError('Nepodařilo se aktualizovat profil');
     }
+  };
 
-    return (
-        <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-montserrat">My Profile</h2>
-                {!isEditing && (
-                    <button
-                        onClick={() => setIsEditing(true)}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                    >
-                        Edit Profile
-                    </button>
-                )}
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  if (!userData) {
+    return <div>Načítání...</div>;
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white shadow-md rounded-xl">
+      <h1 className="text-2xl font-bold mb-6">Profil uživatele</h1>
+      
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+      {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
+
+      {isEditing ? (
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-2">Jméno</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
             </div>
-
-            {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    {error}
-                </div>
-            )}
-
-            {success && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                    {success}
-                </div>
-            )}
-
-            {isEditing ? (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                            Name
-                        </label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label htmlFor="surname" className="block text-sm font-medium text-gray-700">
-                            Surname
-                        </label>
-                        <input
-                            type="text"
-                            id="surname"
-                            name="surname"
-                            value={formData.surname}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                            Email
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            readOnly
-                            disabled
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 cursor-not-allowed"
-                        />
-                        <p className="mt-1 text-sm text-gray-500">Cannot change email</p>
-                    </div>
-
-                    <div>
-                        <label htmlFor="bodyFatPercentage" className="block text-sm font-medium text-gray-700">
-                            Body Fat Percentage
-                        </label>
-                        <input
-                            type="number"
-                            id="bodyFatPercentage"
-                            name="bodyFatPercentage"
-                            value={formData.bodyFatPercentage}
-                            onChange={handleChange}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label htmlFor="weight" className="block text-sm font-medium text-gray-700">
-                            Weight
-                        </label>
-                        <input
-                            type="number"
-                            id="weight"
-                            name="weight"
-                            value={formData.weight}
-                            onChange={handleChange}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label htmlFor="height" className="block text-sm font-medium text-gray-700">
-                            Height
-                        </label>
-                        <input
-                            type="number"
-                            id="height"
-                            name="height"
-                            value={formData.height}
-                            onChange={handleChange}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        />
-                    </div>
-
-                    <div className="flex space-x-4">
-                        <button
-                            type="submit"
-                            className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                        >
-                            Save Changes
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setIsEditing(false);
-                                setFormData({
-                                    name: userData.name,
-                                    surname: userData.surname,
-                                    email: userData.email,
-                                    bodyFatPercentage: userData.bodyFatPercentage || '',
-                                    weight: userData.weight || '',
-                                    height: userData.height || ''
-                                });
-                            }}
-                            className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            ) : (
-                <div className="space-y-4">
-                    <div className="flex items-center">
-                        <span className="font-semibold w-32">Name:</span>
-                        <span>{userData.name}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <span className="font-semibold w-32">Surname:</span>
-                        <span>{userData.surname}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <span className="font-semibold w-32">Email:</span>
-                        <span>{userData.email}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <span className="font-semibold w-32">Body Fat Percentage:</span>
-                        <span>{userData.bodyFatPercentage || 'Není zadáno'}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <span className="font-semibold w-32">Weight:</span>
-                        <span>{userData.weight || 'Není zadáno'} kg</span>
-                    </div>
-                    <div className="flex items-center">
-                        <span className="font-semibold w-32">Height:</span>
-                        <span>{userData.height || 'Není zadáno'} cm</span>
-                    </div>
-                </div>
-            )}
+            <div>
+              <label className="block mb-2">Příjmení</label>
+              <input
+                type="text"
+                name="surname"
+                value={formData.surname}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block mb-2">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block mb-2">Výška (cm)</label>
+              <input
+                type="number"
+                name="height"
+                value={formData.height}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block mb-2">Váha (kg)</label>
+              <input
+                type="number"
+                name="weight"
+                value={formData.weight}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block mb-2">Procento tuku (%)</label>
+              <input
+                type="number"
+                name="bodyFatPercentage"
+                value={formData.bodyFatPercentage}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+          </div>
+          <div className="mt-6 flex gap-4">
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Uložit
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            >
+              Zrušit
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="font-semibold">Jméno</p>
+              <p>{userData.name}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Příjmení</p>
+              <p>{userData.surname}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Email</p>
+              <p>{userData.email}</p>
+            </div>
+            <div>
+              <p className="font-semibold">Výška</p>
+              <p>{userData.height} cm</p>
+            </div>
+            <div>
+              <p className="font-semibold">Váha</p>
+              <p>{userData.weight} kg</p>
+            </div>
+            <div>
+              <p className="font-semibold">Procento tuku</p>
+              <p>{userData.bodyFatPercentage}%</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsEditing(true)}
+            className="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Upravit profil
+          </button>
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default ProfilePage;
