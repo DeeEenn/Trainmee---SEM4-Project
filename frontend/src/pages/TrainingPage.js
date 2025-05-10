@@ -177,7 +177,7 @@ const TrainingPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto mt-10 p-6">
-      <h1 className="text-2xl font-bold mb-6">Tréninky</h1>
+      <h1 className="text-2xl font-montserrat mb-6">Tréninky</h1>
       
       {error && <div className="text-red-500 mb-4">{error}</div>}
       {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
@@ -186,17 +186,17 @@ const TrainingPage = () => {
         <div>
           <div className="flex flex-col gap-4 mb-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Seznam tréninků</h2>
+              <h2 className="text-xl font-montserrat">Seznam tréninků</h2>
               {trainings.length > 0 && (
                 <button
                   onClick={() => setIsDeletingAll(true)}
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                  className="bg-red-600s text-white px-4 py-2 rounded hover:bg-red-700"
                 >
                   Smazat vše
                 </button>
               )}
             </div>
-            
+      
             <div className="flex gap-2">
               <select
                 value={selectedBodyPart}

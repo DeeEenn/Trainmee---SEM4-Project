@@ -4,6 +4,7 @@ import ProfilePage from "./pages/ProfilePage"; // vytvoř si tuto komponentu
 import AuthForm from "./components/AuthForm";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ProgressPage from "./pages/ProgressPage";
 import TrainingPage from "./pages/TrainingPage";
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(
@@ -45,6 +46,7 @@ function App() {
                                 />
                                 <Route path="/profile" element={<ProfilePage />} />
                                 <Route path="/training" element={<TrainingPage />} />
+                                <Route path="/progress" element={<ProgressPage />} />
                                 {/* další route jako /training, /goals atd. */}
                             </Routes>
                         </div>

@@ -40,7 +40,7 @@ const TrainingForm = ({ onAddTraining, onCancel, training }) => {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="name" className="block text-sm font-montserrat text-gray-700">
                     Training name
                 </label>
                 <input

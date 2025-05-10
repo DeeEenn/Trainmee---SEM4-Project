@@ -14,7 +14,7 @@ public class UserProfileDto {
     public UserProfileDto(String name, String surname, String email, Double bodyFatPercentage, Double weight, Double height) {
         this.name = name;
         this.surname = surname;
-        this.email = email;
+        this.email = email; 
         this.bodyFatPercentage = bodyFatPercentage;
         this.weight = weight;
         this.height = height;
