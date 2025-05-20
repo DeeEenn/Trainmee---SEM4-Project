@@ -8,10 +8,12 @@ const AuthForm = ({ onAuthSuccess }) => {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     const formData = mode === "login" 
       ? { email, password }
@@ -25,83 +27,99 @@ const AuthForm = ({ onAuthSuccess }) => {
       localStorage.setItem("token", response.data.token);
       onAuthSuccess();
     } catch (error) {
-      setError(error.response?.data?.message || "Něco se pokazilo");
+      setError(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 bg-white shadow-md p-6 rounded-xl">
-      <h2 className="text-2xl font-bold mb-4 text-center">
-        {mode === "login" ? "Přihlášení" : "Registrace"}
-      </h2>
+    <div className="min-h-screen py-24">
+      <div className="max-w-2xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-light text-gray-900 mb-4">
+            {mode === "login" ? "Sign In" : "Sign Up"}
+          </h1>
+          <p className="text-gray-600 font-light">
+            {mode === "login" ? "Sign in to your account" : "Create a new account"}
+          </p>
+        </div>
 
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-
-      <form onSubmit={handleSubmit}>
-        {mode === "register" && (
-          <>
-            <input
-              className="w-full mb-3 p-2 border rounded"
-              placeholder="Jméno"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-            <input
-              className="w-full mb-3 p-2 border rounded"
-              placeholder="Příjmení"
-              value={surname}
-              onChange={(e) => setSurname(e.target.value)}
-              required
-            />
-          </>
+        {error && (
+          <div className="mb-8 border-l-4 border-red-500 pl-4 py-2">
+            <p className="text-red-600">{error}</p>
+          </div>
         )}
-        <input
-          className="w-full mb-3 p-2 border rounded"
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          className="w-full mb-3 p-2 border rounded"
-          type="password"
-          placeholder="Heslo"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-          type="submit"
-        >
-          {mode === "login" ? "Přihlásit" : "Registrovat"}
-        </button>
-      </form>
 
-      <div className="mt-4 text-center text-sm">
-        {mode === "login" ? (
-          <>
-            Nemáte účet?{" "}
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {mode === "register" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">First Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Last Name</label>
+                <input
+                  type="text"
+                  value={surname}
+                  onChange={(e) => setSurname(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                />
+              </div>
+            </div>
+          )}
+          <div>
+            <label className="block text-sm text-gray-600 mb-2">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-600 mb-2">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+            />
+          </div>
+          <div className="pt-4">
             <button
-              className="text-blue-600 hover:underline"
-              onClick={() => setMode("register")}
+              type="submit"
+              disabled={loading}
+              className="w-full px-6 py-3 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors disabled:opacity-50"
             >
-              Registrovat
+              {loading 
+                ? (mode === "login" ? "Signing in..." : "Signing up...") 
+                : (mode === "login" ? "Sign In" : "Sign Up")}
             </button>
-          </>
-        ) : (
-          <>
-            Máte účet?{" "}
-            <button
-              className="text-blue-600 hover:underline"
-              onClick={() => setMode("login")}
-            >
-              Přihlásit
-            </button>
-          </>
-        )}
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              {mode === "login" ? "Don't have an account? " : "Already have an account? "}
+              <button
+                type="button"
+                onClick={() => setMode(mode === "login" ? "register" : "login")}
+                className="text-gray-900 hover:underline"
+              >
+                {mode === "login" ? "Sign Up" : "Sign In"}
+              </button>
+            </p>
+          </div>
+        </form>
       </div>
     </div>
   );

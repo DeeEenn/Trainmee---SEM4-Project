@@ -19,7 +19,6 @@
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/model/Training.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/model/User.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/repository/ExerciseRepository.java
-/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/repository/ProgressReporsitory.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/repository/ProgressRepository.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/repository/TrainingRepository.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/repository/UserRepository.java

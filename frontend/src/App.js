@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ProfilePage from "./pages/ProfilePage"; // vytvoř si tuto komponentu
+import ProfilePage from "./pages/ProfilePage";
 import AuthForm from "./components/AuthForm";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import ProgressPage from "./pages/ProgressPage";
 import TrainingPage from "./pages/TrainingPage";
+import ProgressPage from "./pages/ProgresPage";
+
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(
         !!localStorage.getItem("token")
@@ -17,48 +18,72 @@ function App() {
     };
 
     return (
-            <div className="min-h-screen bg-gray-100">
-                {isAuthenticated ? (
-                    <div className="flex flex-col h-screen">
-                        <Navbar onLogout={handleLogout} />
-                        <div className="flex-1">
-                            <Routes>
-                                <Route
-                                    path="/"
-                                    element={
-                                        <div className="flex items-center justify-center h-full">
-                                            <div className="text-center">
-                                                <h1 className="text-3xl font-montserrat mb-6">
-                                                    Welcome to your training app 💪
+        <div className="flex flex-col min-h-screen bg-white">
+            {isAuthenticated ? (
+                <>
+                    <Navbar onLogout={handleLogout} />
+                    <main className="flex-grow">
+                        <Routes>
+                            <Route
+                                path="/"
+                                element={
+                                    <div className="min-h-screen py-24">
+                                        <div className="max-w-4xl mx-auto px-6">
+                                            <div className="text-center mb-20">
+                                                <h1 className="text-5xl font-light text-gray-900 mb-6">
+                                                    Trainmee
                                                 </h1>
-                                                <p className="text-lg mb-4">
-                                                    Are you ready to start working on your self? 🥳
+                                                <p className="text-lg text-gray-600 font-light">
+                                                    Track your progress. Achieve your goals.
                                                 </p>
-                                                <p className="text-lg mb-4">
-                                                    Use our app to track your progress and goals 💫
-                                                </p>
-                                                <p className="text-lg mb-4">
-                                                    With us you'll be built different soon enough 🦍
+                                            </div>
+
+                                            <div className="space-y-12">
+                                                <div className="border-l-4 border-gray-900 pl-6">
+                                                    <h2 className="text-2xl font-light text-gray-900 mb-3">Track Progress</h2>
+                                                    <p className="text-gray-600">
+                                                        Monitor your fitness journey with precision and clarity.
+                                                    </p>
+                                                </div>
+
+                                                <div className="border-l-4 border-gray-900 pl-6">
+                                                    <h2 className="text-2xl font-light text-gray-900 mb-3">Manage Workouts</h2>
+                                                    <p className="text-gray-600">
+                                                        Organize your training sessions with ease and efficiency.
+                                                    </p>
+                                                </div>
+
+                                                <div className="border-l-4 border-gray-900 pl-6">
+                                                    <h2 className="text-2xl font-light text-gray-900 mb-3">Analyze Results</h2>
+                                                    <p className="text-gray-600">
+                                                        Understand your progress through clear, actionable insights.
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-20 text-center">
+                                                <p className="text-gray-600 font-light">
+                                                    Start your journey today
                                                 </p>
                                             </div>
                                         </div>
-                                    }
-                                />
-                                <Route path="/profile" element={<ProfilePage />} />
-                                <Route path="/training" element={<TrainingPage />} />
-                                <Route path="/progress" element={<ProgressPage />} />
-                                {/* další route jako /training, /goals atd. */}
-                            </Routes>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="flex items-center justify-center h-screen">
-                        <AuthForm onAuthSuccess={() => setIsAuthenticated(true)} />
-                    </div>
-                )}
-                <Footer />
-            </div>
-    )
+                                    </div>
+                                }
+                            />
+                            <Route path="/profile" element={<ProfilePage />} />
+                            <Route path="/training" element={<TrainingPage />} />
+                            <Route path="/progress" element={<ProgressPage />} />
+                        </Routes>
+                    </main>
+                </>
+            ) : (
+                <div className="flex-grow flex items-center justify-center">
+                    <AuthForm onAuthSuccess={() => setIsAuthenticated(true)} />
+                </div>
+            )}
+            <Footer />
+        </div>
+    );
 }
 
 export default App;

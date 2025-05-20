@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/users/profile").authenticated()
                 .requestMatchers("/api/trainings/**").authenticated()
+                .requestMatchers("/api/progress/**").authenticated()
                 .anyRequest().denyAll()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

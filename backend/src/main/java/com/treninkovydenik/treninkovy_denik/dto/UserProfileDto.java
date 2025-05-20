@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class UserProfileDto {
+    private Long id;
     private String name;
     private String surname;
     private String email;
@@ -11,13 +12,22 @@ public class UserProfileDto {
     private Double weight;
     private Double height;
 
-    public UserProfileDto(String name, String surname, String email, Double bodyFatPercentage, Double weight, Double height) {
+    public UserProfileDto(Long id, String name, String surname, String email, Double bodyFatPercentage, Double weight, Double height) {
+        this.id = id;
         this.name = name;
         this.surname = surname;
         this.email = email; 
         this.bodyFatPercentage = bodyFatPercentage;
         this.weight = weight;
         this.height = height;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

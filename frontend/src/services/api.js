@@ -8,29 +8,31 @@ const api = axios.create({
   },
 });
 
-// Interceptor pro přidání tokenu do každého požadavku
+// Token interceptor
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  console.log('Token z localStorage:', token ? 'existuje' : 'neexistuje');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    console.log('Přidávám token do hlavičky:', config.headers.Authorization);
   }
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
-// Interceptor pro zpracování chyb
+// Response interceptor
 api.interceptors.response.use(
-  (response) => {
-    console.log('Úspěšná odpověď:', response.config.url, response.status);
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('Chyba v odpovědi:', error.config.url, error.response?.status, error.response?.data);
-    if (error.response?.status === 401) {
-      console.log('401 Unauthorized - odstraňuji token a přesměrovávám na login');
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+    if (error.response) {
+      // Server responded with error
+      if (error.response.status === 401) {
+        // Unauthorized - clear token and redirect to login
+        localStorage.removeItem('token');
+        window.location.href = '/';
+      } else if (error.response.status === 403) {
+        // Forbidden - user doesn't have permission
+        console.error('Access forbidden:', error.response.data);
+      }
     }
     return Promise.reject(error);
   }
@@ -59,6 +61,14 @@ export const trainingService = {
 export const exerciseService = {
   getAll: () => api.get(API_ENDPOINTS.exercises.list),
   getById: (id) => api.get(API_ENDPOINTS.exercises.detail(id)),
+};
+
+export const progressService = {
+  createMeasurement: (data) => api.post(API_ENDPOINTS.progress.create, data),
+  getUserMeasurements: (userId, startDate, endDate) => 
+    api.get(API_ENDPOINTS.progress.list(userId), { params: { startDate, endDate } }),
+  getTrainingStats: (userId, startDate, endDate) => 
+    api.get(API_ENDPOINTS.progress.stats(userId), { params: { startDate, endDate } })
 };
 
 export default api;

@@ -30,5 +30,10 @@ const API_CONFIG = {
     exercises: {
       list: '/exercises',
       detail: (id) => `/exercises/${id}`,
+    },
+    progress: {
+      list: (userId) => `/progress/user/${userId}`,
+      create: '/progress',
+      stats: (userId) => `/progress/user/${userId}/training-stats`,
     }
   };

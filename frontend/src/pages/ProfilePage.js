@@ -32,7 +32,7 @@ const ProfilePage = () => {
         bodyFatPercentage: response.data.bodyFatPercentage || ''
       });
     } catch (error) {
-      setError('Nepodařilo se načíst profil');
+      setError('Failed to load profile');
     }
   };
 
@@ -42,10 +42,10 @@ const ProfilePage = () => {
       const response = await userService.updateProfile(formData);
       setUserData(response.data);
       setIsEditing(false);
-      setSuccessMessage('Profil byl úspěšně aktualizován');
+      setSuccessMessage('Profile updated successfully');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
-      setError('Nepodařilo se aktualizovat profil');
+      setError('Failed to update profile');
     }
   };
 
@@ -58,132 +58,156 @@ const ProfilePage = () => {
   };
 
   if (!userData) {
-    return <div>Načítání...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white shadow-md rounded-xl">
-      <h1 className="text-2xl font-bold mb-6">Profil uživatele</h1>
-      
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
-
-      {isEditing ? (
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block mb-2">Jméno</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">Příjmení</label>
-              <input
-                type="text"
-                name="surname"
-                value={formData.surname}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">Výška (cm)</label>
-              <input
-                type="number"
-                name="height"
-                value={formData.height}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">Váha (kg)</label>
-              <input
-                type="number"
-                name="weight"
-                value={formData.weight}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">Procento tuku (%)</label>
-              <input
-                type="number"
-                name="bodyFatPercentage"
-                value={formData.bodyFatPercentage}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-          </div>
-          <div className="mt-6 flex gap-4">
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Uložit
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-            >
-              Zrušit
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="font-semibold">Jméno</p>
-              <p>{userData.name}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Příjmení</p>
-              <p>{userData.surname}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Email</p>
-              <p>{userData.email}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Výška</p>
-              <p>{userData.height} cm</p>
-            </div>
-            <div>
-              <p className="font-semibold">Váha</p>
-              <p>{userData.weight} kg</p>
-            </div>
-            <div>
-              <p className="font-semibold">Procento tuku</p>
-              <p>{userData.bodyFatPercentage}%</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setIsEditing(true)}
-            className="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Upravit profil
-          </button>
+    <div className="min-h-screen py-24">
+      <div className="max-w-2xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-light text-gray-900 mb-4">
+            Profile
+          </h1>
+          <p className="text-gray-600 font-light">
+            Manage your personal information
+          </p>
         </div>
-      )}
+
+        {error && (
+          <div className="mb-8 border-l-4 border-red-500 pl-4 py-2">
+            <p className="text-red-600">{error}</p>
+          </div>
+        )}
+        
+        {successMessage && (
+          <div className="mb-8 border-l-4 border-green-500 pl-4 py-2">
+            <p className="text-green-600">{successMessage}</p>
+          </div>
+        )}
+
+        {isEditing ? (
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">First Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Last Name</label>
+                <input
+                  type="text"
+                  name="surname"
+                  value={formData.surname}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Height (cm)</label>
+                <input
+                  type="number"
+                  name="height"
+                  value={formData.height}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Weight (kg)</label>
+                <input
+                  type="number"
+                  name="weight"
+                  value={formData.weight}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Body Fat (%)</label>
+                <input
+                  type="number"
+                  name="bodyFatPercentage"
+                  value={formData.bodyFatPercentage}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                />
+              </div>
+            </div>
+            <div className="flex gap-4 pt-4">
+              <button
+                type="submit"
+                className="flex-1 px-6 py-3 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
+              >
+                Save Changes
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="flex-1 px-6 py-3 border border-gray-300 text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="space-y-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-sm text-gray-600 mb-2">First Name</h3>
+                <p className="text-lg text-gray-900">{userData.name}</p>
+              </div>
+              <div>
+                <h3 className="text-sm text-gray-600 mb-2">Last Name</h3>
+                <p className="text-lg text-gray-900">{userData.surname}</p>
+              </div>
+              <div>
+                <h3 className="text-sm text-gray-600 mb-2">Email</h3>
+                <p className="text-lg text-gray-900">{userData.email}</p>
+              </div>
+              <div>
+                <h3 className="text-sm text-gray-600 mb-2">Height</h3>
+                <p className="text-lg text-gray-900">{userData.height} cm</p>
+              </div>
+              <div>
+                <h3 className="text-sm text-gray-600 mb-2">Weight</h3>
+                <p className="text-lg text-gray-900">{userData.weight} kg</p>
+              </div>
+              <div>
+                <h3 className="text-sm text-gray-600 mb-2">Body Fat</h3>
+                <p className="text-lg text-gray-900">{userData.bodyFatPercentage}%</p>
+              </div>
+            </div>
+            <div className="pt-4">
+              <button
+                onClick={() => setIsEditing(true)}
+                className="w-full px-6 py-3 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
+              >
+                Edit Profile
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

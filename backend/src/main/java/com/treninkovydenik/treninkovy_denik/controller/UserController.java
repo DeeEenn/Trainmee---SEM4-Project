@@ -2,7 +2,7 @@ package com.treninkovydenik.treninkovy_denik.controller;
 
 import com.treninkovydenik.treninkovy_denik.dto.UserProfileDto;
 import com.treninkovydenik.treninkovy_denik.model.User;
-import com.treninkovydenik.treninkovy_denik.repository.UserRepository;
+import com.treninkovydenik.treninkovy_denik.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
@@ -29,11 +29,12 @@ public class UserController {
             String email = authentication.getName();
             logger.info("User email from authentication: {}", email);
             
-            User user = userRepository.findByEmail(email)
+            User user = userService.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
             logger.info("Found user: {}", user);
                 
             UserProfileDto userProfile = new UserProfileDto(
+                user.getId(),
                 user.getName(),
                 user.getSurname(),
                 user.getEmail(),
@@ -59,21 +60,22 @@ public class UserController {
             String email = authentication.getName();
             logger.info("User email from authentication: {}", email);
             
-            User user = userRepository.findByEmail(email)
+            User user = userService.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
             logger.info("Found user: {}", user);
 
-            // Aktualizace dat uživatele - email se nemění
+            // Update user data
             user.setName(profileDto.getName());
             user.setSurname(profileDto.getSurname());
             user.setBodyFatPercentage(profileDto.getBodyFatPercentage());
             user.setWeight(profileDto.getWeight());
             user.setHeight(profileDto.getHeight());
             
-            user = userRepository.save(user);
+            user = userService.updateUserProfile(user);
             logger.info("Updated user: {}", user);
             
             UserProfileDto updatedProfile = new UserProfileDto(
+                user.getId(),
                 user.getName(),
                 user.getSurname(),
                 user.getEmail(),

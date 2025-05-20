@@ -30,12 +30,12 @@ const TrainingPage = () => {
   const itemsPerPage = 5;
 
   const bodyPartLabels = {
-    'LEGS': 'Nohy',
-    'CHEST': 'Prsa',
-    'BACK': 'Záda',
-    'SHOULDERS': 'Ramena',
-    'ARMS': 'Ruce',
-    'ABS': 'Břicho'
+    'LEGS': 'Legs',
+    'CHEST': 'Chest',
+    'BACK': 'Back',
+    'SHOULDERS': 'Shoulders',
+    'ARMS': 'Arms',
+    'ABS': 'Abs'
   };
 
   useEffect(() => {
@@ -58,7 +58,7 @@ const TrainingPage = () => {
       }, {});
       setTrainingExercises(exercisesMap);
     } catch (error) {
-      setError('Nepodařilo se načíst tréninky');
+      setError('Failed to load workouts');
     }
   };
 
@@ -68,7 +68,7 @@ const TrainingPage = () => {
       setExercises(response.data);
       setSelectedTraining(trainings.find(t => t.id === trainingId));
     } catch (error) {
-      setError('Nepodařilo se načíst cvičení');
+      setError('Failed to load exercises');
     }
   };
 
@@ -88,10 +88,9 @@ const TrainingPage = () => {
       }));
       setNewExercise({ name: '', sets: '', reps: '', weight: '', description: '', bodyPart: 'LEGS' });
       setIsAddingExercise(false);
-      setSuccessMessage('Cvičení bylo úspěšně přidáno');
+      setSuccessMessage('Exercise added successfully');
     } catch (error) {
-      console.error('Chyba při přidávání cvičení:', error.response?.data || error.message);
-      setError(error.response?.data?.message || 'Nepodařilo se přidat cvičení');
+      setError('Failed to add exercise');
     }
   };
 
@@ -108,9 +107,9 @@ const TrainingPage = () => {
         delete newMap[id];
         return newMap;
       });
-      setSuccessMessage('Trénink byl úspěšně smazán');
+      setSuccessMessage('Workout deleted successfully');
     } catch (error) {
-      setError('Nepodařilo se smazat trénink');
+      setError('Failed to delete workout');
     }
   };
 
@@ -122,10 +121,10 @@ const TrainingPage = () => {
       setSelectedTraining(null);
       setExercises([]);
       setTrainingExercises({});
-      setSuccessMessage('Všechny tréninky byly úspěšně smazány');
+      setSuccessMessage('All workouts deleted successfully');
       setIsDeletingAll(false);
     } catch (error) {
-      setError('Nepodařilo se smazat všechny tréninky');
+      setError('Failed to delete all workouts');
     }
   };
 
@@ -141,10 +140,9 @@ const TrainingPage = () => {
       setTrainings(prev => [...prev, response.data]);
       setNewTraining({ name: '', date: new Date().toISOString().split('T')[0], description: '' });
       setIsAddingTraining(false);
-      setSuccessMessage('Trénink byl úspěšně přidán');
+      setSuccessMessage('Workout added successfully');
     } catch (error) {
-      console.error('Chyba při přidávání tréninku:', error.response?.data || error.message);
-      setError(error.response?.data?.message || 'Nepodařilo se přidat trénink');
+      setError('Failed to add workout');
     }
   };
 
@@ -176,123 +174,141 @@ const TrainingPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 p-6">
-      <h1 className="text-2xl font-montserrat mb-6">Tréninky</h1>
-      
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
+    <div className="min-h-screen py-24">
+      <div className="max-w-4xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-light text-gray-900 mb-4">
+            My Workouts
+          </h1>
+          <p className="text-gray-600 font-light">
+            Manage your workouts and track your progress
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <div className="flex flex-col gap-4 mb-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-montserrat">Seznam tréninků</h2>
-              {trainings.length > 0 && (
-                <button
-                  onClick={() => setIsDeletingAll(true)}
-                  className="bg-red-600s text-white px-4 py-2 rounded hover:bg-red-700"
-                >
-                  Smazat vše
-                </button>
-              )}
-            </div>
-      
-            <div className="flex gap-2">
-              <select
-                value={selectedBodyPart}
-                onChange={(e) => {
-                  setSelectedBodyPart(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="p-2 border rounded flex-1"
-              >
-                <option value="ALL">Všechny části těla</option>
-                <option value="LEGS">Nohy</option>
-                <option value="CHEST">Prsa</option>
-                <option value="BACK">Záda</option>
-                <option value="SHOULDERS">Ramena</option>
-                <option value="ARMS">Ruce</option>
-                <option value="ABS">Břicho</option>
-              </select>
-              
-              <input
-                type="text"
-                placeholder="Hledat trénink..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="p-2 border rounded flex-1"
-              />
-            </div>
+        {error && (
+          <div className="mb-8 border-l-4 border-red-500 pl-4 py-2">
+            <p className="text-red-600">{error}</p>
           </div>
-          
-          {!isAddingTraining ? (
-            <button
-              onClick={() => setIsAddingTraining(true)}
-              className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        )}
+        
+        {successMessage && (
+          <div className="mb-8 border-l-4 border-green-500 pl-4 py-2">
+            <p className="text-green-600">{successMessage}</p>
+          </div>
+        )}
+
+        <div className="flex justify-between items-center mb-12">
+          <div className="flex gap-4">
+            <select
+              value={selectedBodyPart}
+              onChange={(e) => {
+                setSelectedBodyPart(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
             >
-              Přidat trénink
+              <option value="ALL">All Body Parts</option>
+              {Object.entries(bodyPartLabels).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+            
+            <input
+              type="text"
+              placeholder="Search workout..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+            />
+          </div>
+          {trainings.length > 0 && (
+            <button
+              onClick={() => setIsDeletingAll(true)}
+              className="px-6 py-3 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
+            >
+              Delete All
             </button>
-          ) : (
-            <form onSubmit={handleAddTraining} className="mb-4 p-4 border rounded">
-              <div className="grid grid-cols-1 gap-4">
+          )}
+        </div>
+
+        {!isAddingTraining ? (
+          <button
+            onClick={() => setIsAddingTraining(true)}
+            className="w-full mb-12 px-6 py-3 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
+          >
+            Add Workout
+          </button>
+        ) : (
+          <form onSubmit={handleAddTraining} className="mb-12 space-y-8">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Workout Name</label>
                 <input
                   type="text"
-                  placeholder="Název tréninku"
                   value={newTraining.name}
                   onChange={(e) => setNewTraining(prev => ({ ...prev, name: e.target.value }))}
-                  className="p-2 border rounded"
+                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
                   required
                 />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Date</label>
                 <input
                   type="date"
                   value={newTraining.date}
                   onChange={(e) => setNewTraining(prev => ({ ...prev, date: e.target.value }))}
-                  className="p-2 border rounded"
+                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
                   required
                 />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Description</label>
                 <textarea
-                  placeholder="Popis"
                   value={newTraining.description}
                   onChange={(e) => setNewTraining(prev => ({ ...prev, description: e.target.value }))}
-                  className="p-2 border rounded"
+                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
                 />
               </div>
-              <div className="mt-2 flex gap-2">
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                  Přidat
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsAddingTraining(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                >
-                  Zrušit
-                </button>
-              </div>
-            </form>
-          )}
-          
-          <div className="space-y-4">
+            </div>
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                className="flex-1 px-6 py-3 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsAddingTraining(false)}
+                className="flex-1 px-6 py-3 border border-gray-300 text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-8">
             {paginatedTrainings.map(training => (
               <div
                 key={training.id}
-                className={`p-4 border rounded-lg cursor-pointer ${
-                  selectedTraining?.id === training.id ? 'bg-blue-50' : ''
+                className={`border-l-4 pl-6 cursor-pointer transition-colors ${
+                  selectedTraining?.id === training.id 
+                    ? 'border-gray-900' 
+                    : 'border-gray-300 hover:border-gray-900'
                 }`}
                 onClick={() => handleTrainingSelect(training.id)}
               >
                 <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{training.name}</h3>
-                    <p className="text-sm text-gray-600">{new Date(training.date).toLocaleDateString()}</p>
+                  <div>
+                    <h3 className="text-xl font-light text-gray-900 mb-2">{training.name}</h3>
+                    <p className="text-gray-600">{new Date(training.date).toLocaleDateString()}</p>
                     {training.description && (
-                      <p className="mt-2 text-gray-700">{training.description}</p>
+                      <p className="mt-2 text-gray-600">{training.description}</p>
                     )}
                   </div>
                   <button
@@ -300,201 +316,228 @@ const TrainingPage = () => {
                       e.stopPropagation();
                       handleDeleteTraining(training.id);
                     }}
-                    className="text-red-500 hover:text-red-700 ml-4"
+                    className="text-red-500 hover:text-red-700"
                   >
-                    Smazat
+                    Delete
                   </button>
                 </div>
               </div>
             ))}
+
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-8">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 border ${
+                    currentPage === 1
+                      ? 'border-gray-300 text-gray-300 cursor-not-allowed'
+                      : 'border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white'
+                  } transition-colors`}
+                >
+                  Previous
+                </button>
+                
+                {[...Array(totalPages)].map((_, index) => (
+                  <button
+                    key={index + 1}
+                    onClick={() => handlePageChange(index + 1)}
+                    className={`px-4 py-2 border ${
+                      currentPage === index + 1
+                        ? 'border-gray-900 bg-gray-900 text-white'
+                        : 'border-gray-300 text-gray-600 hover:border-gray-900 hover:text-gray-900'
+                    } transition-colors`}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+                
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-4 py-2 border ${
+                    currentPage === totalPages
+                      ? 'border-gray-300 text-gray-300 cursor-not-allowed'
+                      : 'border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white'
+                  } transition-colors`}
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
 
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-4">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={`px-3 py-1 rounded ${
-                  currentPage === 1
-                    ? 'bg-gray-300 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
-              >
-                Předchozí
-              </button>
-              
-              {[...Array(totalPages)].map((_, index) => (
-                <button
-                  key={index + 1}
-                  onClick={() => handlePageChange(index + 1)}
-                  className={`px-3 py-1 rounded ${
-                    currentPage === index + 1
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 hover:bg-gray-300'
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
-              
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1 rounded ${
-                  currentPage === totalPages
-                    ? 'bg-gray-300 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
-              >
-                Další
-              </button>
+          {selectedTraining && (
+            <div className="space-y-8">
+              <div className="border-l-4 border-gray-900 pl-6">
+                <h2 className="text-2xl font-light text-gray-900 mb-4">
+                  Exercises for {selectedTraining.name}
+                </h2>
+                
+                {!isAddingExercise ? (
+                  <button
+                    onClick={() => setIsAddingExercise(true)}
+                    className="w-full mb-8 px-6 py-3 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
+                  >
+                    Add Exercise
+                  </button>
+                ) : (
+                  <form onSubmit={handleAddExercise} className="mb-8 space-y-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                      <div>
+                        <label className="block text-sm text-gray-600 mb-2">Exercise Name</label>
+                        <input
+                          type="text"
+                          value={newExercise.name}
+                          onChange={(e) => setNewExercise(prev => ({
+                            ...prev,
+                            name: e.target.value
+                          }))}
+                          className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-600 mb-2">Body Part</label>
+                        <select
+                          value={newExercise.bodyPart}
+                          onChange={(e) => setNewExercise(prev => ({
+                            ...prev,
+                            bodyPart: e.target.value
+                          }))}
+                          className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                          required
+                        >
+                          {Object.entries(bodyPartLabels).map(([value, label]) => (
+                            <option key={value} value={value}>{label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-600 mb-2">Sets</label>
+                        <input
+                          type="number"
+                          value={newExercise.sets}
+                          onChange={(e) => setNewExercise(prev => ({
+                            ...prev,
+                            sets: e.target.value
+                          }))}
+                          className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-600 mb-2">Reps</label>
+                        <input
+                          type="number"
+                          value={newExercise.reps}
+                          onChange={(e) => setNewExercise(prev => ({
+                            ...prev,
+                            reps: e.target.value
+                          }))}
+                          className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-600 mb-2">Weight (kg)</label>
+                        <input
+                          type="number"
+                          value={newExercise.weight}
+                          onChange={(e) => setNewExercise(prev => ({
+                            ...prev,
+                            weight: e.target.value
+                          }))}
+                          className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-600 mb-2">Description</label>
+                      <textarea
+                        value={newExercise.description}
+                        onChange={(e) => setNewExercise(prev => ({
+                          ...prev,
+                          description: e.target.value
+                        }))}
+                        className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                      />
+                    </div>
+                    <div className="flex gap-4">
+                      <button
+                        type="submit"
+                        className="flex-1 px-6 py-3 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
+                      >
+                        Add
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingExercise(false)}
+                        className="flex-1 px-6 py-3 border border-gray-300 text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                <div className="space-y-8">
+                  {exercises.map(exercise => (
+                    <div key={exercise.id} className="border-l-4 border-gray-300 pl-6">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-xl font-light text-gray-900 mb-2">{exercise.name}</h3>
+                          <p className="text-gray-600 mb-4">Body Part: {bodyPartLabels[exercise.bodyPart]}</p>
+                          <div className="grid grid-cols-3 gap-8">
+                            <div>
+                              <p className="text-sm text-gray-600 mb-1">Sets</p>
+                              <p className="text-gray-900">{exercise.sets}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600 mb-1">Reps</p>
+                              <p className="text-gray-900">{exercise.reps}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600 mb-1">Weight</p>
+                              <p className="text-gray-900">{exercise.weight} kg</p>
+                            </div>
+                          </div>
+                          {exercise.description && (
+                            <p className="mt-4 text-gray-600">{exercise.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>
-
-        {selectedTraining && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">
-              Cvičení pro {selectedTraining.name}
-            </h2>
-            
-            {!isAddingExercise ? (
-              <button
-                onClick={() => setIsAddingExercise(true)}
-                className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              >
-                Přidat cvičení
-              </button>
-            ) : (
-              <form onSubmit={handleAddExercise} className="mb-4 p-4 border rounded">
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Název cvičení"
-                    value={newExercise.name}
-                    onChange={(e) => setNewExercise(prev => ({
-                      ...prev,
-                      name: e.target.value
-                    }))}
-                    className="p-2 border rounded"
-                    required
-                  />
-                  <select
-                    value={newExercise.bodyPart}
-                    onChange={(e) => setNewExercise(prev => ({
-                      ...prev,
-                      bodyPart: e.target.value
-                    }))}
-                    className="p-2 border rounded"
-                    required
-                  >
-                    <option value="LEGS">Nohy</option>
-                    <option value="CHEST">Prsa</option>
-                    <option value="BACK">Záda</option>
-                    <option value="SHOULDERS">Ramena</option>
-                    <option value="ARMS">Ruce</option>
-                    <option value="ABS">Břicho</option>
-                  </select>
-                  <input
-                    type="number"
-                    placeholder="Počet sérií"
-                    value={newExercise.sets}
-                    onChange={(e) => setNewExercise(prev => ({
-                      ...prev,
-                      sets: e.target.value
-                    }))}
-                    className="p-2 border rounded"
-                    required
-                  />
-                  <input
-                    type="number"
-                    placeholder="Počet opakování"
-                    value={newExercise.reps}
-                    onChange={(e) => setNewExercise(prev => ({
-                      ...prev,
-                      reps: e.target.value
-                    }))}
-                    className="p-2 border rounded"
-                    required
-                  />
-                  <input
-                    type="number"
-                    placeholder="Váha (kg)"
-                    value={newExercise.weight}
-                    onChange={(e) => setNewExercise(prev => ({
-                      ...prev,
-                      weight: e.target.value
-                    }))}
-                    className="p-2 border rounded"
-                    required
-                  />
-                  <textarea
-                    placeholder="Popis"
-                    value={newExercise.description}
-                    onChange={(e) => setNewExercise(prev => ({
-                      ...prev,
-                      description: e.target.value
-                    }))}
-                    className="p-2 border rounded"
-                  />
-                </div>
-                <div className="mt-2 flex gap-2">
-                  <button
-                    type="submit"
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                  >
-                    Přidat
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsAddingExercise(false)}
-                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                  >
-                    Zrušit
-                  </button>
-                </div>
-              </form>
-            )}
-
-            <div className="space-y-4">
-              {exercises.map(exercise => (
-                <div key={exercise.id} className="p-4 border rounded-lg">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold">{exercise.name}</h3>
-                      <p className="text-sm text-gray-600">Část těla: {bodyPartLabels[exercise.bodyPart] || exercise.bodyPart}</p>
-                      <p>Série: {exercise.sets}</p>
-                      <p>Opakování: {exercise.reps}</p>
-                      <p>Váha: {exercise.weight} kg</p>
-                      {exercise.description && (
-                        <p className="mt-2 text-gray-700">{exercise.description}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {isDeletingAll && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg">
-            <h3 className="text-xl font-semibold mb-4">Smazat všechny tréninky?</h3>
-            <p className="mb-4">Tato akce je nevratná.</p>
-            <div className="flex gap-2">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white p-8 max-w-md w-full">
+            <h3 className="text-xl font-light text-gray-900 mb-4">
+              Delete all workouts?
+            </h3>
+            <p className="text-gray-600 mb-8">
+              This action cannot be undone. Are you sure you want to delete all your workouts?
+            </p>
+            <div className="flex gap-4">
               <button
                 onClick={handleDeleteAllTrainings}
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                className="flex-1 px-6 py-3 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
               >
-                Ano, smazat vše
+                Delete All
               </button>
               <button
                 onClick={() => setIsDeletingAll(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                className="flex-1 px-6 py-3 border border-gray-300 text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-colors"
               >
-                Zrušit
+                Cancel
               </button>
             </div>
           </div>

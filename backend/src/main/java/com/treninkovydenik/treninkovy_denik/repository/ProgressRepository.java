@@ -1,13 +1,16 @@
 package com.treninkovydenik.treninkovy_denik.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import com.treninkovydenik.treninkovy_denik.model.Progress;
-import java.time.LocalDateTime;
+import com.treninkovydenik.treninkovy_denik.model.User;
+import java.time.LocalDate;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProgressRepository extends JpaRepository<Progress, Long> {
     List<Progress> findByUserIdOrderByDateDesc(Long userId);
-    List<Progress> findByUserIdAndDateBetweenOrderByDateDesc(Long userId, LocalDateTime startDate, LocalDateTime endDate);
-} 
+    List<Progress> findByUserIdAndDateBetweenOrderByDateDesc(Long userId, LocalDate startDate, LocalDate endDate);
+    List<Progress> findByUserIdAndDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
+    boolean existsByUserAndDate(User user, LocalDate date);
+}
