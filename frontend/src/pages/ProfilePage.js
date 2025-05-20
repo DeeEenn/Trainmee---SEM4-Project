@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { userService } from '../services/api';
 
 const ProfilePage = () => {
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -19,10 +21,28 @@ const ProfilePage = () => {
     loadUserProfile();
   }, []);
 
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const response = await userService.uploadProfilePicture(file);
+      setProfilePicture(response.data);
+      setSuccessMessage('Profile picture uploaded successfully');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      setError('Failed to upload profile picture');
+    } finally {
+      setUploading(false);
+    }
+  } 
+
   const loadUserProfile = async () => {
     try {
       const response = await userService.getProfile();
       setUserData(response.data);
+      setProfilePicture(response.data.profilePictureUrl);
       setFormData({
         name: response.data.name || '',
         surname: response.data.surname || '',
@@ -88,6 +108,53 @@ const ProfilePage = () => {
             <p className="text-green-600">{successMessage}</p>
           </div>
         )}
+
+        <div className="mb-8">
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <img
+                src={profilePicture || '/default-avatar.png'}
+                alt="Profile"
+                className="w-24 h-24 rounded-full object-cover"
+              />
+              <label
+                htmlFor="profile-picture"
+                className="absolute bottom-0 right-0 bg-gray-900 text-white p-2 rounded-full cursor-pointer hover:bg-gray-700"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </label>
+              <input
+                type="file"
+                id="profile-picture"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+                disabled={uploading}
+              />
+            </div>
+            {uploading && (
+              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-gray-900"></div>
+            )}
+          </div>
+        </div>
 
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-8">

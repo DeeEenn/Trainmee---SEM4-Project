@@ -13,7 +13,7 @@ const Navbar = ({ onLogout }) => {
       <div className="max-w-4xl mx-auto px-6">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-xl font-light text-gray-900">
-            Trainmee
+            Traynmee
           </Link>
           
           <div className="flex gap-8">

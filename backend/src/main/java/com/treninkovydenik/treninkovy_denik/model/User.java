@@ -37,6 +37,18 @@ public class User {
     @Column
     private Double height;
 
+    @Column
+    private String profilePictureUrl;
+
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

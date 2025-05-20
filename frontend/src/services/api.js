@@ -46,6 +46,15 @@ export const authService = {
 export const userService = {
   getProfile: () => api.get(API_ENDPOINTS.users.profile),
   updateProfile: (data) => api.put(API_ENDPOINTS.users.updateProfile, data),
+  uploadProfilePicture: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(API_ENDPOINTS.users.uploadProfilePicture, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
 };
 
 export const trainingService = {

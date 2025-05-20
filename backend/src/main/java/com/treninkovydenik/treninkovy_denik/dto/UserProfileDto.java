@@ -11,8 +11,9 @@ public class UserProfileDto {
     private Double bodyFatPercentage;
     private Double weight;
     private Double height;
+    private String profilePictureUrl;
 
-    public UserProfileDto(Long id, String name, String surname, String email, Double bodyFatPercentage, Double weight, Double height) {
+    public UserProfileDto(Long id, String name, String surname, String email, Double bodyFatPercentage, Double weight, Double height, String profilePictureUrl) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -20,8 +21,17 @@ public class UserProfileDto {
         this.bodyFatPercentage = bodyFatPercentage;
         this.weight = weight;
         this.height = height;
+        this.profilePictureUrl = profilePictureUrl;
     }
 
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
+    }
+    
     public Long getId() {
         return id;
     }

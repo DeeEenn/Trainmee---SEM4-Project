@@ -21,6 +21,7 @@ const API_CONFIG = {
     users: {
       profile: '/users/profile',
       updateProfile: '/users/profile',
+      uploadProfilePicture: '/files/profile-picture',
     },
     trainings: {
       list: '/trainings',
@@ -36,4 +37,4 @@ const API_CONFIG = {
       create: '/progress',
       stats: (userId) => `/progress/user/${userId}/training-stats`,
     }
-  };
+  }

@@ -31,7 +31,7 @@ function App() {
                                         <div className="max-w-4xl mx-auto px-6">
                                             <div className="text-center mb-20">
                                                 <h1 className="text-5xl font-light text-gray-900 mb-6">
-                                                    Trainmee
+                                                    Traynmee
                                                 </h1>
                                                 <p className="text-lg text-gray-600 font-light">
                                                     Track your progress. Achieve your goals.

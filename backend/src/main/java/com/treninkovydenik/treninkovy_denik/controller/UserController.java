@@ -40,7 +40,8 @@ public class UserController {
                 user.getEmail(),
                 user.getBodyFatPercentage(),
                 user.getWeight(),
-                user.getHeight()
+                user.getHeight(),
+                user.getProfilePictureUrl()
             );
             logger.info("Returning user profile: {}", userProfile);
                 
@@ -81,7 +82,8 @@ public class UserController {
                 user.getEmail(),
                 user.getBodyFatPercentage(),
                 user.getWeight(),
-                user.getHeight()
+                user.getHeight(),
+                user.getProfilePictureUrl()
             );
             logger.info("Returning updated profile: {}", updatedProfile);
             
