@@ -11,21 +11,27 @@ Traynmee is training diary developed for managing and watching your activies. Ap
 - **Autentization**: JWT (JSON Web Tokens)
 
 ### 2.2 Project structure
-├── frontend/ # React application
-│ ├── src/
-│ │ ├── components/ # React components
-│ │ ├── pages/ # Application pages
-│ │ ├── services/ # API services
-│ │ └── config/ # Configurations
-│ └── public/ # Static files
+
+```
+project-root/
+├── frontend/                   # React application
+│   ├── public/                 # Static files
+│   └── src/
+│       ├── components/         # React components
+│       ├── pages/              # Application pages
+│       ├── services/           # API services
+│       └── config/             # Configurations
 │
-└── backend/ # Spring Boot application
-├── src/
-│ ├── main/
-│ │ ├── java/ # Java source codes
-│ │ └── resources/ # Configuration files
-│ └── test/ # Tests
-└── uploads/ # Uploaded files
+├── backend/                    # Spring Boot application
+│   ├── uploads/                # Uploaded files
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/           # Java source code
+│   │   │   └── resources/      # Configuration files
+│   │   └── test/               # Tests
+│
+└── README.md                   # Documentation (optional)
+```
 
 
 ## 3. Main features
