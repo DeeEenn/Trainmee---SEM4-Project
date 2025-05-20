@@ -77,7 +77,7 @@ function App() {
                     </main>
                 </>
             ) : (
-                <div className="flex-grow flex items-center justify-center">
+                <div className="flex-grow flex items-center justify-center p-4">
                     <AuthForm onAuthSuccess={() => setIsAuthenticated(true)} />
                 </div>
             )}

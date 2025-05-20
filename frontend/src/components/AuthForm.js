@@ -34,10 +34,10 @@ const AuthForm = ({ onAuthSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen py-24">
-      <div className="max-w-2xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-light text-gray-900 mb-4">
+    <div className="min-h-screen py-12 sm:py-24">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-12 sm:mb-16">
+          <h1 className="text-3xl sm:text-4xl font-light text-gray-900 mb-4">
             {mode === "login" ? "Sign In" : "Sign Up"}
           </h1>
           <p className="text-gray-600 font-light">
@@ -46,14 +46,14 @@ const AuthForm = ({ onAuthSuccess }) => {
         </div>
 
         {error && (
-          <div className="mb-8 border-l-4 border-red-500 pl-4 py-2">
+          <div className="mb-6 sm:mb-8 border-l-4 border-red-500 pl-4 py-2">
             <p className="text-red-600">{error}</p>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           {mode === "register" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
               <div>
                 <label className="block text-sm text-gray-600 mb-2">First Name</label>
                 <input
@@ -100,7 +100,7 @@ const AuthForm = ({ onAuthSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors disabled:opacity-50"
+              className="w-full px-4 sm:px-6 py-3 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors disabled:opacity-50"
             >
               {loading 
                 ? (mode === "login" ? "Signing in..." : "Signing up...") 

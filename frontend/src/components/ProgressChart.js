@@ -41,23 +41,52 @@ import {
     }
     const options = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 position: 'top',
+                labels: {
+                    boxWidth: 12,
+                    padding: 15,
+                    font: {
+                        size: window.innerWidth < 640 ? 10 : 12
+                    }
+                }
             },
             title: {
                 display: true,
-                text: 'Weight and Body Fat Percentage Progress'
+                text: 'Weight and Body Fat Percentage Progress',
+                font: {
+                    size: window.innerWidth < 640 ? 14 : 16
+                },
+                padding: {
+                    top: 10,
+                    bottom: 20
+                }
             }
         },
         scales: {
             y: {
-                beginAtZero: false
+                beginAtZero: false,
+                ticks: {
+                    font: {
+                        size: window.innerWidth < 640 ? 10 : 12
+                    }
+                }
+            },
+            x: {
+                ticks: {
+                    font: {
+                        size: window.innerWidth < 640 ? 10 : 12
+                    },
+                    maxRotation: 45,
+                    minRotation: 45
+                }
             }
         }
     }
     return (
-        <div className='progress-chart'>
+        <div className='progress-chart h-[300px] sm:h-[400px] p-4'>
             <Line data={data} options={options} />
         </div>
     )

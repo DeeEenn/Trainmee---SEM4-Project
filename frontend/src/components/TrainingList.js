@@ -41,7 +41,7 @@ const TrainingList = ({ trainings, onDeleteTraining, onUpdateTraining, onSelectT
                         />
                     ) : (
                         <>
-                            <div className="flex justify-between items-start">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-2 sm:space-y-0">
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-900">
                                         {training.name}
@@ -50,9 +50,9 @@ const TrainingList = ({ trainings, onDeleteTraining, onUpdateTraining, onSelectT
                                         {new Date(training.date).toLocaleString('cs-CZ')}
                                     </p>
                                 </div>
-                                <div className="flex space-x-2">
+                                <div className="flex space-x-4 sm:space-x-2">
                                     <button 
-                                        className="text-indigo-600 hover:text-indigo-800"
+                                        className="text-indigo-600 hover:text-indigo-800 text-sm sm:text-base"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleEdit(training);
@@ -61,7 +61,7 @@ const TrainingList = ({ trainings, onDeleteTraining, onUpdateTraining, onSelectT
                                         Edit
                                     </button>
                                     <button 
-                                        className="text-red-600 hover:text-red-800"
+                                        className="text-red-600 hover:text-red-800 text-sm sm:text-base"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             onDeleteTraining(training.id);
@@ -72,7 +72,7 @@ const TrainingList = ({ trainings, onDeleteTraining, onUpdateTraining, onSelectT
                                 </div>
                             </div>
                             {training.description && (
-                                <p className="mt-2 text-gray-600">
+                                <p className="mt-2 text-gray-600 text-sm sm:text-base">
                                     {training.description}
                                 </p>
                             )}

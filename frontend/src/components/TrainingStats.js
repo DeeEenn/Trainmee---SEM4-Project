@@ -32,19 +32,19 @@ const TrainingStats = ({ userId }) => {
 
     return (
         <div className="p-4 bg-white rounded-lg shadow">
-            <h2 className="text-xl font-bold mb-4">Statistiky tréninků</h2>
+            <h2 className="text-lg sm:text-xl font-bold mb-4">Statistiky tréninků</h2>
             
             {error && (
-                <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
+                <div className="mb-4 p-2 bg-red-100 text-red-700 rounded text-sm sm:text-base">
                     {error}
                 </div>
             )}
 
-            <div className="mb-4 flex gap-2">
+            <div className="mb-4 flex flex-col sm:flex-row gap-2">
                 <select 
                     value={selectedMonth} 
                     onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                    className="p-2 border rounded bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="p-2 border rounded bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 >
                     {Array.from({length: 12}, (_, i) => (
                         <option key={i+1} value={i+1}>
@@ -56,7 +56,7 @@ const TrainingStats = ({ userId }) => {
                 <select 
                     value={selectedYear} 
                     onChange={(e) => setSelectedYear(Number(e.target.value))}
-                    className="p-2 border rounded bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="p-2 border rounded bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 >
                     {Array.from({length: 5}, (_, i) => (
                         <option key={i} value={new Date().getFullYear() - i}>
@@ -67,21 +67,21 @@ const TrainingStats = ({ userId }) => {
             </div>
 
             {loading ? (
-                <div className="text-center py-4">Načítání...</div>
+                <div className="text-center py-4 text-sm sm:text-base">Načítání...</div>
             ) : (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {Object.entries(stats).map(([date, count]) => (
                         <div key={date} className="p-3 border rounded bg-gray-50">
-                            <div className="font-bold text-gray-800">
+                            <div className="font-bold text-gray-800 text-sm sm:text-base">
                                 {new Date(date).toLocaleDateString('cs')}
                             </div>
-                            <div className="text-gray-600">
+                            <div className="text-gray-600 text-sm sm:text-base">
                                 Počet tréninků: {count}
                             </div>
                         </div>
                     ))}
                     {Object.keys(stats).length === 0 && (
-                        <div className="col-span-2 text-center text-gray-500 py-4">
+                        <div className="col-span-1 sm:col-span-2 text-center text-gray-500 py-4 text-sm sm:text-base">
                             Žádné tréninky v tomto období
                         </div>
                     )}
