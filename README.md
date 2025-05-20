@@ -30,7 +30,7 @@ project-root/
 │   │   │   └── resources/      # Configuration files
 │   │   └── test/               # Tests
 │
-└── README.md                   # Documentation (optional)
+└── README.md                  
 ```
 
 
