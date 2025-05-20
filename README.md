@@ -1,6 +1,6 @@
 # Traynmee - Project documentation
 
-## 1. Úvod
+## 1. Wassup!
 Traynmee is training diary developed for managing and watching your activies. Aplication allows user to watch their trainings and progress.
 ## 2. Architekture
 
@@ -65,7 +65,7 @@ Traynmee is training diary developed for managing and watching your activies. Ap
 - PUT `/api/trainings/{id}` - Training update
 - DELETE `/api/trainings/{id}` - Training delete
 
-## 5. Databsase
+## 5. Database
 
 ### 5.1 Tables
 - `users` 
