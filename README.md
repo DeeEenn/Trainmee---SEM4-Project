@@ -55,7 +55,7 @@ project-root/
 
 ## 4. Implemented endpoints
 
-### 4.1 Autentizace
+### 4.1 Auth
 - POST `/api/auth/register` - New user regisration
 - POST `/api/auth/login` - User login
 
