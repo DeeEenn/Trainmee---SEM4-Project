@@ -1,6 +1,6 @@
 # Traynmee - Project documentation
 
-## 1. Wassup!
+## 1. Introduction
 Traynmee is training diary developed for managing and watching your activies. Aplication allows user to watch their trainings and progress.
 ## 2. Architekture
 
