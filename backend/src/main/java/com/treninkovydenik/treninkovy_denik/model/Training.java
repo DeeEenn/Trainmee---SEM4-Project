@@ -38,51 +38,17 @@ public class Training {
     private List<Exercise> exercises = new ArrayList<>();
     
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public LocalDateTime getDate() { return date; }
+    public String getDescription() { return description; }
+    public User getUser() { return user; }
+    public List<Exercise> getExercises() { return exercises; }
+    public void setId(Long id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setDate(LocalDateTime date) { this.date = date; }
+    public void setDescription(String description) { this.description = description; }
+    public void setUser(User user) { this.user = user; }
+    public void setExercises(List<Exercise> exercises) { this.exercises = exercises; }
+ }
 
-    public String getName() {
-        return name;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<Exercise> getExercises() {
-        return exercises;
-    }
-
-    public void setExercises(List<Exercise> exercises) {
-        this.exercises = exercises;
-    }
-}

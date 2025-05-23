@@ -3,6 +3,7 @@
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/config/JwtTokenProvider.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/config/SecurityConfig.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/controller/AuthController.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/controller/FileController.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/controller/ProgressController.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/controller/TrainingController.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/controller/UserController.java
@@ -24,6 +25,7 @@
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/repository/UserRepository.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/service/AuthService.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/service/CustomUserDetailsService.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/service/FileService.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/service/ProgressService.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/service/TrainingService.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/service/UserService.java

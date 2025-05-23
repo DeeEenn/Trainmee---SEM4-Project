@@ -24,67 +24,20 @@ public class UserProfileDto {
         this.profilePictureUrl = profilePictureUrl;
     }
 
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
-
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
-    }
-    
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Double getBodyFatPercentage() {
-        return bodyFatPercentage;
-    }
-
-    public void setBodyFatPercentage(Double bodyFatPercentage) {
-        this.bodyFatPercentage = bodyFatPercentage;
-    }
-
-    public Double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(Double weight) {
-        this.weight = weight;
-    }
-
-    public Double getHeight() {
-        return height;
-    }
-
-    public void setHeight(Double height) {
-        this.height = height;
-    }
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public String getSurname() { return surname; }
+    public String getEmail() { return email; }
+    public Double getBodyFatPercentage() { return bodyFatPercentage; }
+    public Double getWeight() { return weight; }
+    public Double getHeight() { return height; }
+    public String getProfilePictureUrl() { return profilePictureUrl; }
+    public void setId(Long id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setSurname(String surname) { this.surname = surname; }
+    public void setEmail(String email) { this.email = email; }
+    public void setBodyFatPercentage(Double bodyFatPercentage) { this.bodyFatPercentage = bodyFatPercentage; }
+    public void setWeight(Double weight) { this.weight = weight; }
+    public void setHeight(Double height) { this.height = height; }
+    public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
 } 

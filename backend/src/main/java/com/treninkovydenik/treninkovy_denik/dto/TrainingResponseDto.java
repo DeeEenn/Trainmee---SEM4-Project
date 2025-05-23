@@ -10,43 +10,14 @@ public class TrainingResponseDto {
     private String description;
     private List<ExerciseResponseDto> exercises;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<ExerciseResponseDto> getExercises() {
-        return exercises;
-    }
-
-    public void setExercises(List<ExerciseResponseDto> exercises) {
-        this.exercises = exercises;
-    }
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public LocalDateTime getDate() { return date; }
+    public String getDescription() { return description; }
+    public List<ExerciseResponseDto> getExercises() { return exercises; }
+    public void setId(Long id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setDate(LocalDateTime date) { this.date = date; }
+    public void setDescription(String description) { this.description = description; }
+    public void setExercises(List<ExerciseResponseDto> exercises) { this.exercises = exercises; }
 } 
