@@ -4,4 +4,5 @@ public class RegisterRequest {
     public String surname;
     public String email;
     public String password;
+    public String role;
 }

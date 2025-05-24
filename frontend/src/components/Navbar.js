@@ -44,6 +44,16 @@ const Navbar = ({ onLogout }) => {
               Workouts
             </Link>
             <Link
+              to="/trainers"
+              className={`text-sm ${
+                isActive('/trainers')
+                  ? 'text-gray-900 border-b-2 border-gray-900'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Trainers
+            </Link>
+            <Link
               to="/progress"
               className={`text-sm ${
                 isActive('/progress')
@@ -85,6 +95,16 @@ const Navbar = ({ onLogout }) => {
                 }`}
               >
                 Workouts
+              </Link>
+              <Link
+                to="/trainers"
+                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  isActive('/trainers')
+                    ? 'text-gray-900 bg-gray-100'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                Trainers
               </Link>
               <Link
                 to="/progress"

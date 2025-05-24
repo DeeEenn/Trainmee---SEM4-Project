@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import TrainingPage from "./pages/TrainingPage";
 import ProgressPage from "./pages/ProgresPage";
+import TrainerPage from "./pages/TrainerPage";
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(
@@ -73,6 +74,7 @@ function App() {
                             <Route path="/profile" element={<ProfilePage />} />
                             <Route path="/training" element={<TrainingPage />} />
                             <Route path="/progress" element={<ProgressPage />} />
+                            <Route path="/trainers" element={<TrainerPage />} />
                         </Routes>
                     </main>
                 </>

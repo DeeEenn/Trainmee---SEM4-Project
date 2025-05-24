@@ -80,4 +80,16 @@ export const progressService = {
     api.get(API_ENDPOINTS.progress.stats(userId), { params: { startDate, endDate } })
 };
 
+export const trainerService = {
+  getAll: () => api.get(API_ENDPOINTS.trainers.list),
+  getById: (id) => api.get(API_ENDPOINTS.trainers.detail(id)),
+  getReviews: (id) => api.get(API_ENDPOINTS.trainers.reviews(id)),
+  addReview: (id, data) => api.post(API_ENDPOINTS.trainers.reviews(id), data),
+  getMessages: (id) => api.get(API_ENDPOINTS.trainers.messages(id)),
+  sendMessage: (id, data) => api.post(API_ENDPOINTS.trainers.messages(id), data),
+  getTrainingPlans: (id) => api.get(API_ENDPOINTS.trainers.trainingPlans(id)),
+  createTrainingPlan: (id, data) => api.post(API_ENDPOINTS.trainers.trainingPlans(id), data),
+  acceptTrainingPlan: (id, planId) => api.post(API_ENDPOINTS.trainers.acceptTrainingPlan(id, planId))
+};
+
 export default api;

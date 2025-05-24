@@ -36,7 +36,9 @@ public class AuthService {
         user.setSurname(request.surname);
         user.setEmail(request.email);
         user.setPassword(passwordEncoder.encode(request.password));
-        user.setRole("ROLE_USER");
+        // Nastavení role podle požadavku, výchozí je USER
+        String role = (request.role != null) ? request.role.toUpperCase() : "USER";
+        user.setRole(role);
 
         userRepository.save(user);
     }
