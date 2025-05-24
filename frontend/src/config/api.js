@@ -29,7 +29,8 @@ const API_CONFIG = {
       reviews: (id) => `/trainers/${id}/reviews`,
       messages: (id) => `/trainers/${id}/messages`,
       trainingPlans: (id) => `/trainers/${id}/training-plans`,
-      acceptTrainingPlan: (id, planId) => `/trainers/training-plans/${planId}/accept`
+      acceptTrainingPlan: (id, planId) => `/trainers/training-plans/${planId}/accept`,
+      conversations: '/trainers/conversations'
     },
     trainings: {
       list: '/trainings',

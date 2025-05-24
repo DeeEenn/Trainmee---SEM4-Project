@@ -3,11 +3,9 @@ package com.treninkovydenik.treninkovy_denik.service;
 import com.treninkovydenik.treninkovy_denik.model.User;
 import com.treninkovydenik.treninkovy_denik.model.TrainerReview;
 import com.treninkovydenik.treninkovy_denik.model.Message;
-import com.treninkovydenik.treninkovy_denik.model.TrainingPlan;
 import com.treninkovydenik.treninkovy_denik.repository.UserRepository;
 import com.treninkovydenik.treninkovy_denik.repository.TrainerReviewRepository;
 import com.treninkovydenik.treninkovy_denik.repository.MessageRepository;
-import com.treninkovydenik.treninkovy_denik.repository.TrainingPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 public class TrainerService {
@@ -26,9 +25,6 @@ public class TrainerService {
 
     @Autowired
     private MessageRepository messageRepository;
-
-    @Autowired
-    private TrainingPlanRepository trainingPlanRepository;
 
     public List<User> getAllTrainers() {
         return userRepository.findByRole("TRAINER");
@@ -72,40 +68,33 @@ public class TrainerService {
     }
 
     public List<Message> getConversation(User user1, User user2) {
-        return messageRepository.findBySenderAndReceiver(user1, user2);
+        List<Message> messages1 = messageRepository.findBySenderAndReceiver(user1, user2);
+        List<Message> messages2 = messageRepository.findBySenderAndReceiver(user2, user1);
+        
+        List<Message> allMessages = new ArrayList<>();
+        allMessages.addAll(messages1);
+        allMessages.addAll(messages2);
+        
+        // Seřadíme zprávy podle času
+        allMessages.sort((a, b) -> a.getCreatedAt().compareTo(b.getCreatedAt()));
+        
+        return allMessages;
     }
 
     public List<Message> getUnreadMessages(User user) {
         return messageRepository.findByReceiverAndReadFalse(user);
     }
 
-    @Transactional
-    public TrainingPlan createTrainingPlan(User trainer, User user, String title, String description) {
-        TrainingPlan plan = new TrainingPlan();
-        plan.setTrainer(trainer);
-        plan.setUser(user);
-        plan.setTitle(title);
-        plan.setDescription(description);
-        plan.setCreatedAt(LocalDateTime.now());
-        plan.setAccepted(false);
-
-        return trainingPlanRepository.save(plan);
-    }
-
-    public List<TrainingPlan> getUserTrainingPlans(User user) {
-        return trainingPlanRepository.findByUser(user);
-    }
-
-    public List<TrainingPlan> getTrainerTrainingPlans(User trainer) {
-        return trainingPlanRepository.findByTrainer(trainer);
+    public List<Message> getTrainerConversations(User trainer) {
+        return messageRepository.findDistinctConversationsByTrainer(trainer);
     }
 
     @Transactional
-    public TrainingPlan acceptTrainingPlan(Long planId) {
-        TrainingPlan plan = trainingPlanRepository.findById(planId)
-            .orElseThrow(() -> new RuntimeException("Tréninkový plán nenalezen"));
-        
-        plan.setAccepted(true);
-        return trainingPlanRepository.save(plan);
+    public void markMessagesAsRead(User user1, User user2) {
+        List<Message> unreadMessages = messageRepository.findBySenderAndReceiverAndReadFalse(user2, user1);
+        for (Message message : unreadMessages) {
+            message.setRead(true);
+            messageRepository.save(message);
+        }
     }
 } 

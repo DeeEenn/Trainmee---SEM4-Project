@@ -10,21 +10,26 @@ import java.time.LocalDate;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
     private final ProgressRepository progressRepository;
 
-    public UserService(UserRepository userRepository, ProgressRepository progressRepository) {
-        this.userRepository = userRepository;
+    public UserService(ProgressRepository progressRepository) {
         this.progressRepository = progressRepository;
     }
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
     }
 
     @Transactional
@@ -45,5 +50,13 @@ public class UserService {
         }
         
         return savedUser;
+    }
+
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public User saveUser(User user) {
+        return userRepository.save(user);
     }
 } 

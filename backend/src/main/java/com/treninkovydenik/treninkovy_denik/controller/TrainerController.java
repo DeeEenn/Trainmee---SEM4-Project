@@ -3,12 +3,10 @@ package com.treninkovydenik.treninkovy_denik.controller;
 import com.treninkovydenik.treninkovy_denik.model.User;
 import com.treninkovydenik.treninkovy_denik.model.TrainerReview;
 import com.treninkovydenik.treninkovy_denik.model.Message;
-import com.treninkovydenik.treninkovy_denik.model.TrainingPlan;
 import com.treninkovydenik.treninkovy_denik.service.TrainerService;
 import com.treninkovydenik.treninkovy_denik.service.UserService;
 import com.treninkovydenik.treninkovy_denik.dto.TrainerReviewDTO;
 import com.treninkovydenik.treninkovy_denik.dto.MessageDTO;
-import com.treninkovydenik.treninkovy_denik.dto.TrainingPlanDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,11 +15,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/trainers")
 public class TrainerController {
-
     @Autowired
     private TrainerService trainerService;
 
@@ -40,177 +41,163 @@ public class TrainerController {
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/{trainerId}/reviews")
-    public ResponseEntity<TrainerReviewDTO> addReview(
-            @PathVariable Long trainerId,
-            @RequestBody TrainerReviewDTO reviewDTO) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByEmail(auth.getName())
-            .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
-        
-        User trainer = trainerService.getTrainerById(trainerId)
-            .orElseThrow(() -> new RuntimeException("Trenér nenalezen"));
-
-        TrainerReview review = trainerService.addReview(
-            trainer, user, reviewDTO.getRating(), reviewDTO.getComment());
-
-        TrainerReviewDTO responseDTO = new TrainerReviewDTO();
-        responseDTO.setId(review.getId());
-        responseDTO.setTrainerId(review.getTrainer().getId());
-        responseDTO.setUserId(review.getUser().getId());
-        responseDTO.setRating(review.getRating());
-        responseDTO.setComment(review.getComment());
-        responseDTO.setCreatedAt(review.getCreatedAt().toString());
-        responseDTO.setTrainerName(review.getTrainer().getName() + " " + review.getTrainer().getSurname());
-        responseDTO.setUserName(review.getUser().getName() + " " + review.getUser().getSurname());
-
-        return ResponseEntity.ok(responseDTO);
-    }
-
-    @GetMapping("/{trainerId}/reviews")
-    public ResponseEntity<List<TrainerReviewDTO>> getTrainerReviews(@PathVariable Long trainerId) {
-        User trainer = trainerService.getTrainerById(trainerId)
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<List<TrainerReviewDTO>> getTrainerReviews(@PathVariable Long id) {
+        User trainer = trainerService.getTrainerById(id)
             .orElseThrow(() -> new RuntimeException("Trenér nenalezen"));
 
         List<TrainerReviewDTO> reviews = trainerService.getTrainerReviews(trainer).stream()
-            .map(review -> {
-                TrainerReviewDTO dto = new TrainerReviewDTO();
-                dto.setId(review.getId());
-                dto.setTrainerId(review.getTrainer().getId());
-                dto.setUserId(review.getUser().getId());
-                dto.setRating(review.getRating());
-                dto.setComment(review.getComment());
-                dto.setCreatedAt(review.getCreatedAt().toString());
-                dto.setTrainerName(review.getTrainer().getName() + " " + review.getTrainer().getSurname());
-                dto.setUserName(review.getUser().getName() + " " + review.getUser().getSurname());
-                return dto;
-            })
+            .map(this::convertToReviewDTO)
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(reviews);
     }
 
-    @PostMapping("/{trainerId}/messages")
-    public ResponseEntity<MessageDTO> sendMessage(
-            @PathVariable Long trainerId,
-            @RequestBody MessageDTO messageDTO) {
+    @PostMapping("/{id}/reviews")
+    public ResponseEntity<TrainerReviewDTO> addReview(
+        @PathVariable Long id,
+        @RequestBody TrainerReviewDTO reviewDTO
+    ) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User sender = userService.findByEmail(auth.getName())
+        User currentUser = userService.getUserByEmail(auth.getName())
             .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
-        
-        User receiver = trainerService.getTrainerById(trainerId)
+
+        User trainer = trainerService.getTrainerById(id)
             .orElseThrow(() -> new RuntimeException("Trenér nenalezen"));
 
-        Message message = trainerService.sendMessage(sender, receiver, messageDTO.getContent());
+        TrainerReview review = trainerService.addReview(
+            trainer,
+            currentUser,
+            reviewDTO.getRating(),
+            reviewDTO.getComment()
+        );
 
-        MessageDTO responseDTO = new MessageDTO();
-        responseDTO.setId(message.getId());
-        responseDTO.setSenderId(message.getSender().getId());
-        responseDTO.setReceiverId(message.getReceiver().getId());
-        responseDTO.setContent(message.getContent());
-        responseDTO.setCreatedAt(message.getCreatedAt().toString());
-        responseDTO.setRead(message.isRead());
-        responseDTO.setSenderName(message.getSender().getName() + " " + message.getSender().getSurname());
-        responseDTO.setReceiverName(message.getReceiver().getName() + " " + message.getReceiver().getSurname());
-
-        return ResponseEntity.ok(responseDTO);
+        return ResponseEntity.ok(convertToReviewDTO(review));
     }
 
-    @GetMapping("/{trainerId}/messages")
-    public ResponseEntity<List<MessageDTO>> getConversation(@PathVariable Long trainerId) {
+    @GetMapping("/{id}/messages")
+    public ResponseEntity<List<MessageDTO>> getMessages(@PathVariable Long id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByEmail(auth.getName())
-            .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
-        
-        User trainer = trainerService.getTrainerById(trainerId)
+        User trainer = userService.getUserByEmail(auth.getName())
             .orElseThrow(() -> new RuntimeException("Trenér nenalezen"));
 
-        List<MessageDTO> messages = trainerService.getConversation(user, trainer).stream()
-            .map(message -> {
-                MessageDTO dto = new MessageDTO();
-                dto.setId(message.getId());
-                dto.setSenderId(message.getSender().getId());
-                dto.setReceiverId(message.getReceiver().getId());
-                dto.setContent(message.getContent());
-                dto.setCreatedAt(message.getCreatedAt().toString());
-                dto.setRead(message.isRead());
-                dto.setSenderName(message.getSender().getName() + " " + message.getSender().getSurname());
-                dto.setReceiverName(message.getReceiver().getName() + " " + message.getReceiver().getSurname());
-                return dto;
-            })
+        User otherUser = userService.findById(id)
+            .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+
+        // Označíme zprávy jako přečtené
+        trainerService.markMessagesAsRead(trainer, otherUser);
+
+        List<MessageDTO> messages = trainerService.getConversation(trainer, otherUser).stream()
+            .map(this::convertToMessageDTO)
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(messages);
     }
 
-    @PostMapping("/{trainerId}/training-plans")
-    public ResponseEntity<TrainingPlanDTO> createTrainingPlan(
-            @PathVariable Long trainerId,
-            @RequestBody TrainingPlanDTO planDTO) {
+    @PostMapping("/{id}/messages")
+    public ResponseEntity<MessageDTO> sendMessage(
+        @PathVariable Long id,
+        @RequestBody MessageDTO messageDTO
+    ) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByEmail(auth.getName())
-            .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
-        
-        User trainer = trainerService.getTrainerById(trainerId)
+        User trainer = userService.getUserByEmail(auth.getName())
             .orElseThrow(() -> new RuntimeException("Trenér nenalezen"));
 
-        TrainingPlan plan = trainerService.createTrainingPlan(
-            trainer, user, planDTO.getTitle(), planDTO.getDescription());
-
-        TrainingPlanDTO responseDTO = new TrainingPlanDTO();
-        responseDTO.setId(plan.getId());
-        responseDTO.setTrainerId(plan.getTrainer().getId());
-        responseDTO.setUserId(plan.getUser().getId());
-        responseDTO.setTitle(plan.getTitle());
-        responseDTO.setDescription(plan.getDescription());
-        responseDTO.setCreatedAt(plan.getCreatedAt().toString());
-        responseDTO.setAccepted(plan.isAccepted());
-        responseDTO.setTrainerName(plan.getTrainer().getName() + " " + plan.getTrainer().getSurname());
-        responseDTO.setUserName(plan.getUser().getName() + " " + plan.getUser().getSurname());
-
-        return ResponseEntity.ok(responseDTO);
-    }
-
-    @GetMapping("/training-plans")
-    public ResponseEntity<List<TrainingPlanDTO>> getTrainingPlans() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.findByEmail(auth.getName())
+        User user = userService.findById(id)
             .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
 
-        List<TrainingPlanDTO> plans = trainerService.getUserTrainingPlans(user).stream()
-            .map(plan -> {
-                TrainingPlanDTO dto = new TrainingPlanDTO();
-                dto.setId(plan.getId());
-                dto.setTrainerId(plan.getTrainer().getId());
-                dto.setUserId(plan.getUser().getId());
-                dto.setTitle(plan.getTitle());
-                dto.setDescription(plan.getDescription());
-                dto.setCreatedAt(plan.getCreatedAt().toString());
-                dto.setAccepted(plan.isAccepted());
-                dto.setTrainerName(plan.getTrainer().getName() + " " + plan.getTrainer().getSurname());
-                dto.setUserName(plan.getUser().getName() + " " + plan.getUser().getSurname());
-                return dto;
-            })
-            .collect(Collectors.toList());
+        Message message = trainerService.sendMessage(
+            trainer,
+            user,
+            messageDTO.getContent()
+        );
 
-        return ResponseEntity.ok(plans);
+        return ResponseEntity.ok(convertToMessageDTO(message));
     }
 
-    @PostMapping("/training-plans/{planId}/accept")
-    public ResponseEntity<TrainingPlanDTO> acceptTrainingPlan(@PathVariable Long planId) {
-        TrainingPlan plan = trainerService.acceptTrainingPlan(planId);
+    @GetMapping("/conversations")
+    public ResponseEntity<List<ConversationDTO>> getTrainerConversations() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User trainer = userService.getUserByEmail(auth.getName())
+            .orElseThrow(() -> new RuntimeException("Trenér nenalezen"));
 
-        TrainingPlanDTO responseDTO = new TrainingPlanDTO();
-        responseDTO.setId(plan.getId());
-        responseDTO.setTrainerId(plan.getTrainer().getId());
-        responseDTO.setUserId(plan.getUser().getId());
-        responseDTO.setTitle(plan.getTitle());
-        responseDTO.setDescription(plan.getDescription());
-        responseDTO.setCreatedAt(plan.getCreatedAt().toString());
-        responseDTO.setAccepted(plan.isAccepted());
-        responseDTO.setTrainerName(plan.getTrainer().getName() + " " + plan.getTrainer().getSurname());
-        responseDTO.setUserName(plan.getUser().getName() + " " + plan.getUser().getSurname());
+        List<Message> allMessages = trainerService.getTrainerConversations(trainer);
+        Map<Long, ConversationDTO> conversationsMap = new HashMap<>();
 
-        return ResponseEntity.ok(responseDTO);
+        for (Message message : allMessages) {
+            User otherUser = message.getSender().getId().equals(trainer.getId()) 
+                ? message.getReceiver() 
+                : message.getSender();
+            
+            if (!conversationsMap.containsKey(otherUser.getId())) {
+                ConversationDTO conversation = new ConversationDTO();
+                conversation.setSenderId(otherUser.getId());
+                conversation.setSenderName(otherUser.getName() + " " + otherUser.getSurname());
+                conversation.setLastMessage(message.getContent());
+                conversation.setLastMessageTime(message.getCreatedAt());
+                conversation.setUnreadCount(0);
+                conversationsMap.put(otherUser.getId(), conversation);
+            }
+
+            ConversationDTO conversation = conversationsMap.get(otherUser.getId());
+            if (message.getCreatedAt().isAfter(conversation.getLastMessageTime())) {
+                conversation.setLastMessage(message.getContent());
+                conversation.setLastMessageTime(message.getCreatedAt());
+            }
+            if (!message.isRead() && message.getReceiver().getId().equals(trainer.getId())) {
+                conversation.setUnreadCount(conversation.getUnreadCount() + 1);
+            }
+        }
+
+        List<ConversationDTO> conversations = new ArrayList<>(conversationsMap.values());
+        conversations.sort((a, b) -> b.getLastMessageTime().compareTo(a.getLastMessageTime()));
+
+        return ResponseEntity.ok(conversations);
+    }
+
+    private TrainerReviewDTO convertToReviewDTO(TrainerReview review) {
+        TrainerReviewDTO dto = new TrainerReviewDTO();
+        dto.setId(review.getId());
+        dto.setTrainerId(review.getTrainer().getId());
+        dto.setUserId(review.getUser().getId());
+        dto.setRating(review.getRating());
+        dto.setComment(review.getComment());
+        dto.setCreatedAt(review.getCreatedAt().toString());
+        dto.setTrainerName(review.getTrainer().getName() + " " + review.getTrainer().getSurname());
+        dto.setUserName(review.getUser().getName() + " " + review.getUser().getSurname());
+        return dto;
+    }
+
+    private MessageDTO convertToMessageDTO(Message message) {
+        MessageDTO dto = new MessageDTO();
+        dto.setId(message.getId());
+        dto.setSenderId(message.getSender().getId());
+        dto.setReceiverId(message.getReceiver().getId());
+        dto.setContent(message.getContent());
+        dto.setCreatedAt(message.getCreatedAt().toString());
+        dto.setRead(message.isRead());
+        dto.setSenderName(message.getSender().getName() + " " + message.getSender().getSurname());
+        dto.setReceiverName(message.getReceiver().getName() + " " + message.getReceiver().getSurname());
+        return dto;
+    }
+
+    private static class ConversationDTO {
+        private Long senderId;
+        private String senderName;
+        private String lastMessage;
+        private LocalDateTime lastMessageTime;
+        private int unreadCount;
+
+        // Getters and setters
+        public Long getSenderId() { return senderId; }
+        public void setSenderId(Long senderId) { this.senderId = senderId; }
+        public String getSenderName() { return senderName; }
+        public void setSenderName(String senderName) { this.senderName = senderName; }
+        public String getLastMessage() { return lastMessage; }
+        public void setLastMessage(String lastMessage) { this.lastMessage = lastMessage; }
+        public LocalDateTime getLastMessageTime() { return lastMessageTime; }
+        public void setLastMessageTime(LocalDateTime lastMessageTime) { this.lastMessageTime = lastMessageTime; }
+        public int getUnreadCount() { return unreadCount; }
+        public void setUnreadCount(int unreadCount) { this.unreadCount = unreadCount; }
     }
 } 
