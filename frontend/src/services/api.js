@@ -39,7 +39,10 @@ api.interceptors.response.use(
 );
 
 export const authService = {
-  login: (credentials) => api.post(API_ENDPOINTS.auth.login, credentials),
+  login: (credentials) => api.post(API_ENDPOINTS.auth.login, {
+    email: credentials.email,
+    password: credentials.password
+  }),
   register: (userData) => api.post(API_ENDPOINTS.auth.register, userData),
 };
 

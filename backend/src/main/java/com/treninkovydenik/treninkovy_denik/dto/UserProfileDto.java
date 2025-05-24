@@ -17,7 +17,7 @@ public class UserProfileDto {
         this.id = id;
         this.name = name;
         this.surname = surname;
-        this.email = email; 
+        this.email = email;
         this.bodyFatPercentage = bodyFatPercentage;
         this.weight = weight;
         this.height = height;

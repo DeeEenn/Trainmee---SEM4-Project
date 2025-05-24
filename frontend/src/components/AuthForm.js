@@ -25,10 +25,17 @@ const AuthForm = ({ onAuthSuccess }) => {
         ? await authService.login(formData)
         : await authService.register(formData);
       
+      console.log('Login response:', response.data);
+      
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("userId", response.data.userId);
-      onAuthSuccess();
+      localStorage.setItem("userRole", response.data.role);
+      
+      console.log('Stored userRole:', response.data.role);
+      
+      onAuthSuccess(response.data.role);
     } catch (error) {
+      console.error('Login error:', error);
       setError(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);

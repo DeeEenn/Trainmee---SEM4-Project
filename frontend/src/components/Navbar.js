@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 const Navbar = ({ onLogout }) => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const userRole = localStorage.getItem('userRole');
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -43,16 +44,29 @@ const Navbar = ({ onLogout }) => {
             >
               Workouts
             </Link>
-            <Link
-              to="/trainers"
-              className={`text-sm ${
-                isActive('/trainers')
-                  ? 'text-gray-900 border-b-2 border-gray-900'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Trainers
-            </Link>
+            {userRole === "TRAINER" ? (
+              <Link
+                to="/dashboard"
+                className={`text-sm ${
+                  isActive('/dashboard')
+                    ? 'text-gray-900 border-b-2 border-gray-900'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <Link
+                to="/trainers"
+                className={`text-sm ${
+                  isActive('/trainers')
+                    ? 'text-gray-900 border-b-2 border-gray-900'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Trainers
+              </Link>
+            )}
             <Link
               to="/progress"
               className={`text-sm ${
@@ -96,16 +110,29 @@ const Navbar = ({ onLogout }) => {
               >
                 Workouts
               </Link>
-              <Link
-                to="/trainers"
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  isActive('/trainers')
-                    ? 'text-gray-900 bg-gray-100'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-              >
-                Trainers
-              </Link>
+              {userRole === "TRAINER" ? (
+                <Link
+                  to="/dashboard"
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                    isActive('/dashboard')
+                      ? 'text-gray-900 bg-gray-100'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <Link
+                  to="/trainers"
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                    isActive('/trainers')
+                      ? 'text-gray-900 bg-gray-100'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  Trainers
+                </Link>
+              )}
               <Link
                 to="/progress"
                 className={`block px-3 py-2 rounded-md text-base font-medium ${

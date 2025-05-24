@@ -35,7 +35,8 @@ public class TrainerService {
     }
 
     public Optional<User> getTrainerById(Long id) {
-        return userRepository.findById(id);
+        return userRepository.findById(id)
+            .filter(user -> "TRAINER".equals(user.getRole()));
     }
 
     @Transactional

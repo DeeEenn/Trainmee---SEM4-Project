@@ -17,7 +17,7 @@ const TrainerList = () => {
             setTrainers(response.data);
             setLoading(false);
         } catch (err) {
-            setError('Failed to load trainers');
+            setError('Nepodařilo se načíst trenéry');
             setLoading(false);
         }
     };
@@ -41,7 +41,7 @@ const TrainerList = () => {
     if (trainers.length === 0) {
         return (
             <div className="text-center text-gray-500 py-8">
-                <p>No trainers available.</p>
+                <p>Žádní trenéři nejsou k dispozici.</p>
             </div>
         );
     }
@@ -63,7 +63,7 @@ const TrainerList = () => {
                                 to={`/trainers/${trainer.id}`}
                                 className="inline-block px-6 py-2 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
                             >
-                                View Profile
+                                Zobrazit profil
                             </Link>
                         </div>
                     </div>
