@@ -23,6 +23,14 @@ const API_CONFIG = {
       updateProfile: '/users/profile',
       uploadProfilePicture: '/files/profile-picture',
     },
+    trainers: {
+      list: '/trainers',
+      detail: (id) => `/trainers/${id}`,
+      reviews: (id) => `/trainers/${id}/reviews`,
+      messages: (id) => `/trainers/${id}/messages`,
+      trainingPlans: (id) => `/trainers/${id}/training-plans`,
+      acceptTrainingPlan: (id, planId) => `/trainers/training-plans/${planId}/accept`
+    },
     trainings: {
       list: '/trainings',
       detail: (id) => `/trainings/${id}`,

@@ -10,6 +10,8 @@ import com.treninkovydenik.treninkovy_denik.repository.UserRepository;
 import com.treninkovydenik.treninkovy_denik.dto.RegisterRequest;
 import com.treninkovydenik.treninkovy_denik.dto.LoginRequest;
 import com.treninkovydenik.treninkovy_denik.config.JwtTokenProvider;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class AuthService {
@@ -26,7 +28,7 @@ public class AuthService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    public void register(RegisterRequest request) {
+    public Map<String, Object> register(RegisterRequest request) {
         if (userRepository.findByEmail(request.email).isPresent()) {
             throw new RuntimeException("Email already in use");
         }
@@ -36,19 +38,42 @@ public class AuthService {
         user.setSurname(request.surname);
         user.setEmail(request.email);
         user.setPassword(passwordEncoder.encode(request.password));
-        // Nastavení role podle požadavku, výchozí je USER
+        
         String role = (request.role != null) ? request.role.toUpperCase() : "USER";
         user.setRole(role);
 
-        userRepository.save(user);
+        user = userRepository.save(user);
+
+        // Vytvoření autentizace a tokenu
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.email, request.password)
+        );
+        
+        String token = jwtTokenProvider.createToken(authentication);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("userId", user.getId());
+        
+        return response;
     }
 
-    public String login(LoginRequest request) {
+    public Map<String, Object> login(LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email, request.password)
             );
-            return jwtTokenProvider.createToken(authentication);
+            
+            User user = userRepository.findByEmail(request.email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+            
+            String token = jwtTokenProvider.createToken(authentication);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("userId", user.getId());
+            
+            return response;
         } catch (Exception e) {
             throw new RuntimeException("Invalid credentials");
         }

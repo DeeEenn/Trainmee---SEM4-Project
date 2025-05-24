@@ -22,15 +22,13 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        authService.register(request);
-        return ResponseEntity.ok("Registered successfully");
+        Map<String, Object> response = authService.register(request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        String token = authService.login(request);
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
+        Map<String, Object> response = authService.login(request);
         return ResponseEntity.ok(response);
     }
 }

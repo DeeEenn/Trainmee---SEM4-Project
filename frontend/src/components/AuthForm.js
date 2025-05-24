@@ -7,6 +7,7 @@ const AuthForm = ({ onAuthSuccess }) => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
+  const [role, setRole] = useState("USER");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +18,7 @@ const AuthForm = ({ onAuthSuccess }) => {
 
     const formData = mode === "login" 
       ? { email, password }
-      : { name, surname, email, password };
+      : { name, surname, email, password, role };
 
     try {
       const response = mode === "login"
@@ -25,6 +26,7 @@ const AuthForm = ({ onAuthSuccess }) => {
         : await authService.register(formData);
       
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userId", response.data.userId);
       onAuthSuccess();
     } catch (error) {
       setError(error.response?.data?.message || "Something went wrong");
@@ -53,28 +55,42 @@ const AuthForm = ({ onAuthSuccess }) => {
 
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           {mode === "register" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-              <div>
-                <label className="block text-sm text-gray-600 mb-2">First Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
-                />
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-2">First Name</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-2">Last Name</label>
+                  <input
+                    type="text"
+                    value={surname}
+                    onChange={(e) => setSurname(e.target.value)}
+                    required
+                    className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
+                  />
+                </div>
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-2">Last Name</label>
-                <input
-                  type="text"
-                  value={surname}
-                  onChange={(e) => setSurname(e.target.value)}
+                <label className="block text-sm text-gray-600 mb-2">Role</label>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
                   required
                   className="w-full px-4 py-2 border-b border-gray-300 focus:border-gray-900 focus:outline-none bg-transparent"
-                />
+                >
+                  <option value="USER">User</option>
+                  <option value="TRAINER">Trainer</option>
+                </select>
               </div>
-            </div>
+            </>
           )}
           <div>
             <label className="block text-sm text-gray-600 mb-2">Email</label>
