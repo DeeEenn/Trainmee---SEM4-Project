@@ -2,9 +2,6 @@ const API_CONFIG = {
     development: {
       baseUrl: 'http://localhost:8080/api',
     },
-    production: {
-      baseUrl: 'https://vase-produkcni-api.cz/api', // here will be your production URL
-    },
     test: {
       baseUrl: 'http://localhost:8080/api',
     }
