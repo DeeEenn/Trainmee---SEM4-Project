@@ -32,7 +32,6 @@ const Navbar = ({ onLogout }) => {
             </Link>
           </div>
 
-          {/* Desktop menu */}
           <div className="hidden md:flex items-center space-x-8">
             {menuItems.map((item) => (
               <Link
@@ -55,7 +54,6 @@ const Navbar = ({ onLogout }) => {
             </button>
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -73,7 +71,6 @@ const Navbar = ({ onLogout }) => {
         </div>
       </div>
 
-      {/* Mobile menu */}
       {isMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1">

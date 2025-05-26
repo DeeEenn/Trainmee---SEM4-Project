@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/files/**").authenticated()
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers("/api/users/profile").authenticated()
+                .requestMatchers("/api/trainers/profile").authenticated()
                 .requestMatchers("/api/trainings/**").authenticated()
                 .requestMatchers("/api/progress/**").authenticated()
                 .anyRequest().authenticated()

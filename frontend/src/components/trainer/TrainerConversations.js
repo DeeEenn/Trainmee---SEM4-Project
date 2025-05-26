@@ -25,7 +25,7 @@ const TrainerConversations = () => {
             const data = await trainerService.getConversations();
             setConversations(data);
         } catch (err) {
-            setError('Nepodařilo se načíst konverzace');
+            setError('Unable to load conversations');
         } finally {
             setLoading(false);
         }
@@ -36,7 +36,7 @@ const TrainerConversations = () => {
             const data = await trainerService.getMessages(userId);
             setMessages(data);
         } catch (err) {
-            setError('Nepodařilo se načíst zprávy');
+            setError('Unable to load messages');
         }
     };
 
@@ -49,19 +49,18 @@ const TrainerConversations = () => {
             setNewMessage('');
             loadMessages(selectedUser.id);
         } catch (err) {
-            setError('Nepodařilo se odeslat zprávu');
+            setError('Unable to send message');
         }
     };
 
-    if (loading) return <div>Načítání...</div>;
+    if (loading) return <div>Loading...</div>;
     if (error) return <div className="text-red-500">{error}</div>;
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h2 className="text-2xl font-light mb-8">Konverzace</h2>
+            <h2 className="text-2xl font-light mb-8">Conversations</h2>
             
             <div className="flex gap-8">
-                {/* Seznam konverzací */}
                 <div className="w-1/3">
                     <div className="space-y-4">
                         {conversations.map(conversation => (
@@ -75,7 +74,7 @@ const TrainerConversations = () => {
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <h3 className="font-medium">{conversation.user.name} {conversation.user.surname}</h3>
-                                        <p className="text-sm text-gray-600">{conversation.lastMessage?.content || 'Žádné zprávy'}</p>
+                                        <p className="text-sm text-gray-600">{conversation.lastMessage?.content || 'No messages'}</p>
                                     </div>
                                     {conversation.unreadCount > 0 && (
                                         <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -88,13 +87,12 @@ const TrainerConversations = () => {
                     </div>
                 </div>
 
-                {/* Zprávy */}
                 <div className="w-2/3">
                     {selectedUser ? (
                         <>
                             <div className="mb-4">
                                 <h3 className="text-lg font-medium">
-                                    Konverzace s {selectedUser.name} {selectedUser.surname}
+                                    Conversation with {selectedUser.name} {selectedUser.surname}
                                 </h3>
                             </div>
 
@@ -126,21 +124,21 @@ const TrainerConversations = () => {
                                         onChange={(e) => setNewMessage(e.target.value)}
                                         className="flex-1 px-4 py-2 border border-gray-300 rounded"
                                         rows="3"
-                                        placeholder="Napište zprávu..."
+                                        placeholder="Type your message..."
                                     />
                                     <button
                                         type="submit"
                                         className="px-6 py-2 bg-gray-900 text-white hover:bg-gray-800 self-end"
                                         disabled={!newMessage.trim()}
                                     >
-                                        Odeslat
+                                        Send
                                     </button>
                                 </div>
                             </form>
                         </>
                     ) : (
                         <div className="text-center text-gray-500 py-8">
-                            Vyberte konverzaci pro zobrazení zpráv
+                            Select a conversation to view messages
                         </div>
                     )}
                 </div>

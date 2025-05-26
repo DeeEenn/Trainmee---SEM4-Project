@@ -7,15 +7,14 @@ import com.treninkovydenik.treninkovy_denik.service.TrainerService;
 import com.treninkovydenik.treninkovy_denik.service.UserService;
 import com.treninkovydenik.treninkovy_denik.dto.TrainerReviewDTO;
 import com.treninkovydenik.treninkovy_denik.dto.MessageDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import com.treninkovydenik.treninkovy_denik.dto.ConversationDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -23,11 +22,13 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("/api/trainers")
 public class TrainerController {
-    @Autowired
-    private TrainerService trainerService;
+    private final TrainerService trainerService;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public TrainerController(TrainerService trainerService, UserService userService) {
+        this.trainerService = trainerService;
+        this.userService = userService;
+    }
 
     @GetMapping
     public ResponseEntity<List<User>> getAllTrainers() {
@@ -44,7 +45,7 @@ public class TrainerController {
     @GetMapping("/{id}/reviews")
     public ResponseEntity<List<TrainerReviewDTO>> getTrainerReviews(@PathVariable Long id) {
         User trainer = trainerService.getTrainerById(id)
-            .orElseThrow(() -> new RuntimeException("Trenér nenalezen"));
+            .orElseThrow(() -> new RuntimeException("Trainer not found"));
 
         List<TrainerReviewDTO> reviews = trainerService.getTrainerReviews(trainer).stream()
             .map(this::convertToReviewDTO)
@@ -60,10 +61,10 @@ public class TrainerController {
     ) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.getUserByEmail(auth.getName())
-            .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
         User trainer = trainerService.getTrainerById(id)
-            .orElseThrow(() -> new RuntimeException("Trenér nenalezen"));
+            .orElseThrow(() -> new RuntimeException("Trainer not found"));
 
         TrainerReview review = trainerService.addReview(
             trainer,
@@ -79,12 +80,12 @@ public class TrainerController {
     public ResponseEntity<List<MessageDTO>> getMessages(@PathVariable Long id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User trainer = userService.getUserByEmail(auth.getName())
-            .orElseThrow(() -> new RuntimeException("Trenér nenalezen"));
+            .orElseThrow(() -> new RuntimeException("Trainer not found"));
 
         User otherUser = userService.findById(id)
-            .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Označíme zprávy jako přečtené
+        // Marking messages as read
         trainerService.markMessagesAsRead(trainer, otherUser);
 
         List<MessageDTO> messages = trainerService.getConversation(trainer, otherUser).stream()
@@ -101,10 +102,10 @@ public class TrainerController {
     ) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User trainer = userService.getUserByEmail(auth.getName())
-            .orElseThrow(() -> new RuntimeException("Trenér nenalezen"));
+            .orElseThrow(() -> new RuntimeException("Trainer not found"));
 
         User user = userService.findById(id)
-            .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
         Message message = trainerService.sendMessage(
             trainer,
@@ -119,7 +120,7 @@ public class TrainerController {
     public ResponseEntity<List<ConversationDTO>> getTrainerConversations() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User trainer = userService.getUserByEmail(auth.getName())
-            .orElseThrow(() -> new RuntimeException("Trenér nenalezen"));
+                .orElseThrow(() -> new RuntimeException("Trainer not found"));
 
         List<Message> allMessages = trainerService.getTrainerConversations(trainer);
         Map<Long, ConversationDTO> conversationsMap = new HashMap<>();
@@ -155,6 +156,28 @@ public class TrainerController {
         return ResponseEntity.ok(conversations);
     }
 
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateDescription(@RequestBody Map<String, String> request) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User trainer = userService.getUserByEmail(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Trainer not found"));
+
+            // Check if user is trainer
+            if (!"TRAINER".equals(trainer.getRole())) {
+                return ResponseEntity.status(403).body("Access denied - only trainers can edit their description");
+            }
+
+            // Update only description 
+            trainer.setDescription(request.get("description"));
+            trainer = userService.saveUser(trainer);
+            
+            return ResponseEntity.ok(Map.of("description", trainer.getDescription()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     private TrainerReviewDTO convertToReviewDTO(TrainerReview review) {
         TrainerReviewDTO dto = new TrainerReviewDTO();
         dto.setId(review.getId());
@@ -179,25 +202,5 @@ public class TrainerController {
         dto.setSenderName(message.getSender().getName() + " " + message.getSender().getSurname());
         dto.setReceiverName(message.getReceiver().getName() + " " + message.getReceiver().getSurname());
         return dto;
-    }
-
-    private static class ConversationDTO {
-        private Long senderId;
-        private String senderName;
-        private String lastMessage;
-        private LocalDateTime lastMessageTime;
-        private int unreadCount;
-
-        // Getters and setters
-        public Long getSenderId() { return senderId; }
-        public void setSenderId(Long senderId) { this.senderId = senderId; }
-        public String getSenderName() { return senderName; }
-        public void setSenderName(String senderName) { this.senderName = senderName; }
-        public String getLastMessage() { return lastMessage; }
-        public void setLastMessage(String lastMessage) { this.lastMessage = lastMessage; }
-        public LocalDateTime getLastMessageTime() { return lastMessageTime; }
-        public void setLastMessageTime(LocalDateTime lastMessageTime) { this.lastMessageTime = lastMessageTime; }
-        public int getUnreadCount() { return unreadCount; }
-        public void setUnreadCount(int unreadCount) { this.unreadCount = unreadCount; }
     }
 } 

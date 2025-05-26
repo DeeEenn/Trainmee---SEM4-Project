@@ -9,10 +9,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 import com.treninkovydenik.treninkovy_denik.model.User;
-import com.treninkovydenik.treninkovy_denik.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 @Service
 public class FileService {
@@ -21,8 +19,11 @@ public class FileService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public FileService(UserService userService) {
+        this.userService = userService;
+    }
 
     public String uploadProfilePicture(MultipartFile file, String userEmail) throws IOException {
         if (file.isEmpty()) {

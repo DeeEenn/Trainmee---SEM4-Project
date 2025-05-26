@@ -16,11 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     private final ProgressRepository progressRepository;
 
-    public UserService(ProgressRepository progressRepository) {
+    public UserService(UserRepository userRepository, ProgressRepository progressRepository) {
+        this.userRepository = userRepository;
         this.progressRepository = progressRepository;
     }
 

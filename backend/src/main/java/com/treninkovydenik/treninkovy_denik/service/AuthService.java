@@ -1,5 +1,4 @@
 package com.treninkovydenik.treninkovy_denik.service;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,18 +14,17 @@ import java.util.Map;
 
 @Service
 public class AuthService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    public AuthService( UserRepository userRepository,  PasswordEncoder passwordEncoder,   AuthenticationManager authenticationManager,  JwtTokenProvider jwtTokenProvider ) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     public Map<String, Object> register(RegisterRequest request) {
         if (userRepository.findByEmail(request.email).isPresent()) {
@@ -44,7 +42,7 @@ public class AuthService {
 
         user = userRepository.save(user);
 
-        // Vytvoření autentizace a tokenu
+        // Creating authentication and token
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.email, request.password)
         );

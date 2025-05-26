@@ -6,7 +6,6 @@ import com.treninkovydenik.treninkovy_denik.model.Message;
 import com.treninkovydenik.treninkovy_denik.repository.UserRepository;
 import com.treninkovydenik.treninkovy_denik.repository.TrainerReviewRepository;
 import com.treninkovydenik.treninkovy_denik.repository.MessageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,14 +16,15 @@ import java.util.ArrayList;
 
 @Service
 public class TrainerService {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final TrainerReviewRepository trainerReviewRepository;
+    private final MessageRepository messageRepository;
 
-    @Autowired
-    private TrainerReviewRepository trainerReviewRepository;
-
-    @Autowired
-    private MessageRepository messageRepository;
+    public TrainerService(  UserRepository userRepository,   TrainerReviewRepository trainerReviewRepository,  MessageRepository messageRepository ) {
+        this.userRepository = userRepository;
+        this.trainerReviewRepository = trainerReviewRepository;
+        this.messageRepository = messageRepository;
+    }
 
     public List<User> getAllTrainers() {
         return userRepository.findByRole("TRAINER");
@@ -38,7 +38,7 @@ public class TrainerService {
     @Transactional
     public TrainerReview addReview(User trainer, User user, Integer rating, String comment) {
         if (trainerReviewRepository.existsByTrainerAndUser(trainer, user)) {
-            throw new RuntimeException("Uživatel již hodnotil tohoto trenéra");
+            throw new RuntimeException("User already rated this trainer");
         }
 
         TrainerReview review = new TrainerReview();
@@ -75,7 +75,7 @@ public class TrainerService {
         allMessages.addAll(messages1);
         allMessages.addAll(messages2);
         
-        // Seřadíme zprávy podle času
+        // Sort messages by time
         allMessages.sort((a, b) -> a.getCreatedAt().compareTo(b.getCreatedAt()));
         
         return allMessages;

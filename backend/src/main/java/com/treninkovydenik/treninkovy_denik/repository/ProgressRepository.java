@@ -5,9 +5,7 @@ import com.treninkovydenik.treninkovy_denik.model.Progress;
 import com.treninkovydenik.treninkovy_denik.model.User;
 import java.time.LocalDate;
 import java.util.List;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface ProgressRepository extends JpaRepository<Progress, Long> {
     List<Progress> findByUserIdOrderByDateDesc(Long userId);
     List<Progress> findByUserIdAndDateBetweenOrderByDateDesc(Long userId, LocalDate startDate, LocalDate endDate);

@@ -3,7 +3,7 @@ const API_CONFIG = {
       baseUrl: 'http://localhost:8080/api',
     },
     production: {
-      baseUrl: 'https://vase-produkcni-api.cz/api', // zde bude vaše produkční URL
+      baseUrl: 'https://vase-produkcni-api.cz/api', // here will be your production URL
     },
     test: {
       baseUrl: 'http://localhost:8080/api',
@@ -30,7 +30,8 @@ const API_CONFIG = {
       messages: (id) => `/trainers/${id}/messages`,
       trainingPlans: (id) => `/trainers/${id}/training-plans`,
       acceptTrainingPlan: (id, planId) => `/trainers/training-plans/${planId}/accept`,
-      conversations: '/trainers/conversations'
+      conversations: '/trainers/conversations',
+      updateProfile: '/trainers/profile'
     },
     trainings: {
       list: '/trainings',

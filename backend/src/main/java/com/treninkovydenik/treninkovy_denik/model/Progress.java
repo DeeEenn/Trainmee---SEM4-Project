@@ -2,7 +2,6 @@ package com.treninkovydenik.treninkovy_denik.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.math.BigDecimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

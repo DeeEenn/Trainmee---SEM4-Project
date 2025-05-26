@@ -2,7 +2,6 @@ package com.treninkovydenik.treninkovy_denik.controller;
 
 import com.treninkovydenik.treninkovy_denik.service.FileService;
 import com.treninkovydenik.treninkovy_denik.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,12 +14,13 @@ import org.slf4j.LoggerFactory;
 @RequestMapping("/api/files")
 public class FileController {
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+    private final FileService fileService;
+    private final UserService userService;
 
-    @Autowired
-    private FileService fileService;
-
-    @Autowired
-    private UserService userService;
+    public FileController(FileService fileService, UserService userService) {
+        this.fileService = fileService;
+        this.userService = userService;
+    }
 
     @PostMapping("/profile-picture")
     public ResponseEntity<?> uploadProfilePicture(@RequestParam("file") MultipartFile file) {

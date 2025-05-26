@@ -21,7 +21,7 @@ const TrainingStats = ({ userId }) => {
                 });
                 setStats(response.data);
             } catch (error) {
-                setError('Chyba při načítání statistik: ' + (error.response?.data?.message || error.message));
+                setError('Error loading statistics: ' + (error.response?.data?.message || error.message));
             } finally {
                 setLoading(false);
             }
@@ -32,7 +32,7 @@ const TrainingStats = ({ userId }) => {
 
     return (
         <div className="p-4 bg-white rounded-lg shadow">
-            <h2 className="text-lg sm:text-xl font-bold mb-4">Statistiky tréninků</h2>
+            <h2 className="text-lg sm:text-xl font-bold mb-4">Training statistics</h2>
             
             {error && (
                 <div className="mb-4 p-2 bg-red-100 text-red-700 rounded text-sm sm:text-base">
@@ -67,7 +67,7 @@ const TrainingStats = ({ userId }) => {
             </div>
 
             {loading ? (
-                <div className="text-center py-4 text-sm sm:text-base">Načítání...</div>
+                <div className="text-center py-4 text-sm sm:text-base">Loading...</div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {Object.entries(stats).map(([date, count]) => (
@@ -76,13 +76,13 @@ const TrainingStats = ({ userId }) => {
                                 {new Date(date).toLocaleDateString('cs')}
                             </div>
                             <div className="text-gray-600 text-sm sm:text-base">
-                                Počet tréninků: {count}
+                                Number of trainings: {count}
                             </div>
                         </div>
                     ))}
                     {Object.keys(stats).length === 0 && (
                         <div className="col-span-1 sm:col-span-2 text-center text-gray-500 py-4 text-sm sm:text-base">
-                            Žádné tréninky v tomto období
+                            No trainings in this period
                         </div>
                     )}
                 </div>

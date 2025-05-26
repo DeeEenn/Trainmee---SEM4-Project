@@ -90,7 +90,8 @@ export const trainerService = {
   addReview: (id, data) => api.post(API_ENDPOINTS.trainers.reviews(id), data),
   getMessages: (id) => api.get(API_ENDPOINTS.trainers.messages(id)),
   sendMessage: (id, data) => api.post(API_ENDPOINTS.trainers.messages(id), data),
-  getConversations: () => api.get(API_ENDPOINTS.trainers.conversations)
+  getConversations: () => api.get(API_ENDPOINTS.trainers.conversations),
+  updateProfile: (data) => api.put(API_ENDPOINTS.trainers.updateProfile, data)
 };
 
 export default api;

@@ -5,7 +5,6 @@ import com.treninkovydenik.treninkovy_denik.model.User;
 import com.treninkovydenik.treninkovy_denik.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,9 +15,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile() {
@@ -41,7 +42,8 @@ public class UserController {
                 user.getBodyFatPercentage(),
                 user.getWeight(),
                 user.getHeight(),
-                user.getProfilePictureUrl()
+                user.getProfilePictureUrl(),
+                user.getDescription()
             );
             logger.info("Returning user profile: {}", userProfile);
                 
@@ -83,7 +85,8 @@ public class UserController {
                 user.getBodyFatPercentage(),
                 user.getWeight(),
                 user.getHeight(),
-                user.getProfilePictureUrl()
+                user.getProfilePictureUrl(),
+                user.getDescription()
             );
             logger.info("Returning updated profile: {}", updatedProfile);
             

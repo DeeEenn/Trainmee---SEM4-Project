@@ -40,8 +40,13 @@ public class User {
     @Column
     private String profilePictureUrl;
 
+    @Column
+    private String description;
+
     public String getProfilePictureUrl() { return profilePictureUrl; }
     public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
     public Long getId() { return id; }
     public String getName() { return name; }
     public String getSurname() { return surname; }
