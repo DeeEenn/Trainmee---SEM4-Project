@@ -1,1 +1,7 @@
+com/treninkovydenik/treninkovy_denik/service/ProgressServiceTest.class
+com/treninkovydenik/treninkovy_denik/service/UserServiceTest.class
+com/treninkovydenik/treninkovy_denik/service/CustomUserDetailsServiceTest.class
+com/treninkovydenik/treninkovy_denik/service/AuthServiceTest.class
+com/treninkovydenik/treninkovy_denik/service/TrainerServiceTest.class
+com/treninkovydenik/treninkovy_denik/service/TrainingServiceTest.class
 com/treninkovydenik/treninkovy_denik/TreninkovyDenikApplicationTests.class

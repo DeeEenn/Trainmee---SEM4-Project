@@ -28,7 +28,7 @@ public class TrainingController {
     private User getUserFromAuthentication(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return userService.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @PostMapping

@@ -37,7 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             
             String jwt = getJwtFromRequest(request);
             logger.info("JWT token from request: {}", jwt != null ? "present" : "not present");
-
             if (jwt != null) {
                 logger.info("Validating JWT token");
                 if (jwtTokenProvider.validateToken(jwt)) {

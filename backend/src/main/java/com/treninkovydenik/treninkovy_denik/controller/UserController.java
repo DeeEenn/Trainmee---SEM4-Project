@@ -31,7 +31,7 @@ public class UserController {
             logger.info("User email from authentication: {}", email);
             
             User user = userService.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
             logger.info("Found user: {}", user);
                 
             UserProfileDto userProfile = new UserProfileDto(
@@ -64,7 +64,7 @@ public class UserController {
             logger.info("User email from authentication: {}", email);
             
             User user = userService.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+                    .orElseThrow(() -> new RuntimeException("User not found"));
             logger.info("Found user: {}", user);
 
             // Update user data

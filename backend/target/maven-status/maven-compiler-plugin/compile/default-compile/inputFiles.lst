@@ -8,6 +8,7 @@
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/controller/TrainerController.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/controller/TrainingController.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/controller/UserController.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/ConversationDTO.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/ExerciseDto.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/ExerciseResponseDto.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/LoginRequest.java
@@ -16,7 +17,6 @@
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/RegisterRequest.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/TrainerReviewDTO.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/TrainingDTO.java
-/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/TrainingPlanCommentDTO.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/TrainingResponseDto.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/dto/UserProfileDto.java
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/main/java/com/treninkovydenik/treninkovy_denik/model/Exercise.java

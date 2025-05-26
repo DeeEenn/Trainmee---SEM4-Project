@@ -210,32 +210,153 @@ Toto rozdělení zajišťuje:
 
 ## 2. Bezpečnost
 
-### Jak jste implementoval autentizaci a autorizaci?
-- JWT (JSON Web Token) tokeny pro autentizaci
-- Token se vytváří při přihlášení/registraci
-- Platnost tokenu je 1 hodina
-- Token je uložen v localStorage prohlížeče
-- Každý požadavek na API musí obsahovat validní token
+### Jak funguje JWT autentizace ve vašem projektu?
 
-### Proč jste zvolil JWT tokeny a jak fungují?
-JWT tokeny jsem zvolil protože:
-- Jsou stateless (nevyžadují ukládání stavu na serveru)
-- Obsahují všechny potřebné informace o uživateli
-- Jsou digitálně podepsané
-- Mají definovanou dobu platnosti
-- Jsou snadno přenositelné
+**Odpověď:**
+JWT (JSON Web Token) je bezpečný způsob, jak předávat informace o uživateli mezi klientem a serverem. Po přihlášení nebo registraci server vygeneruje token, který klient posílá v každém dalším požadavku. Server token ověří a podle něj pozná, kdo je uživatel a jaká má práva.
 
-Struktura JWT tokenu:
-- Header: typ tokenu a algoritmus
-- Payload: data o uživateli (ID, role, expirace)
-- Signature: digitální podpis pro ověření pravosti
+**Podrobný flow a ukázka kódu:**
 
-### Jak jste zajistil bezpečné ukládání hesel?
-- Použití BCrypt knihovny pro hashování hesel
-- Automatické generování salt pro každé heslo
-- Jednosměrné hashování (nelze dešifrovat)
-- Odolné proti rainbow table útokům
-- Bezpečné porovnávání hesel
+1. **Registrace uživatele**
+   - Uživatel odešle registrační formulář (jméno, email, heslo, role).
+   - Backend zkontroluje, zda email už existuje.
+   - Heslo se zašifruje pomocí `PasswordEncoder` (viz další otázka).
+   - Uživatel se uloží do databáze.
+   - Backend vytvoří JWT token a pošle ho klientovi.
+
+```java
+public Map<String, Object> register(RegisterRequest request) {
+    if (userRepository.findByEmail(request.email).isPresent()) {
+        throw new RuntimeException("Email already in use");
+    }
+    User user = new User();
+    user.setName(request.name);
+    user.setSurname(request.surname);
+    user.setEmail(request.email);
+    user.setPassword(passwordEncoder.encode(request.password)); // Šifrování hesla
+    String role = (request.role != null) ? request.role.toUpperCase() : "USER";
+    user.setRole(role);
+    user = userRepository.save(user);
+
+    Authentication authentication = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(request.email, request.password)
+    );
+    String token = jwtTokenProvider.createToken(authentication); // Vytvoření JWT
+    Map<String, Object> response = new HashMap<>();
+    response.put("token", token);
+    response.put("userId", user.getId());
+    return response;
+}
+```
+
+2. **Přihlášení uživatele**
+   - Uživatel odešle email a heslo.
+   - Backend ověří údaje (`authenticationManager.authenticate`).
+   - Pokud jsou správné, vygeneruje nový JWT token a pošle ho klientovi.
+
+```java
+public Map<String, Object> login(LoginRequest request) {
+    Authentication authentication = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(request.email, request.password)
+    );
+    User user = userRepository.findByEmail(request.email)
+        .orElseThrow(() -> new RuntimeException("User not found"));
+    String token = jwtTokenProvider.createToken(authentication); // Vytvoření JWT
+    Map<String, Object> response = new HashMap<>();
+    response.put("token", token);
+    response.put("userId", user.getId());
+    response.put("role", user.getRole());
+    return response;
+}
+```
+
+3. **Ověření JWT v dalších požadavcích**
+   - Klient posílá JWT v hlavičce každého požadavku.
+   - Backend má JWT filter, který token ověří a nastaví uživatele do kontextu.
+
+```java
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        String token = getJwtFromRequest(request);
+        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+            String username = jwtTokenProvider.getUsernameFromJWT(token);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+        filterChain.doFilter(request, response);
+    }
+}
+```
+
+4. **Vytváření a ověřování JWT**
+
+```java
+public String createToken(Authentication authentication) {
+    String username = authentication.getName();
+    Date now = new Date();
+    Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION_MS);
+    return Jwts.builder()
+            .setSubject(username)
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+            .compact();
+}
+
+public boolean validateToken(String token) {
+    try {
+        Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token);
+        return true;
+    } catch (Exception ex) {
+        return false;
+    }
+}
+```
+
+**Jak bych to řekl u obhajoby:**
+> „JWT tokeny používám pro autentizaci. Po přihlášení nebo registraci server vygeneruje token, který klient ukládá a posílá v každém požadavku. Backend token ověří, a pokud je platný, povolí přístup k chráněným zdrojům. Vše je řešeno pomocí Spring Security a vlastních tříd pro generování a validaci tokenů.“
+
+---
+
+### Jak funguje šifrování hesel ve vašem projektu?
+
+**Odpověď:**
+Hesla nikdy neukládám v čitelné podobě, ale hashují se pomocí algoritmu BCrypt. Při registraci se heslo zašifruje a uloží do databáze. Při přihlášení se zadané heslo porovná s uloženým hashem.
+
+**Podrobný flow a ukázka kódu:**
+
+1. **Při registraci**
+   - Heslo se zašifruje pomocí `passwordEncoder.encode(...)` ještě před uložením do databáze.
+
+```java
+user.setPassword(passwordEncoder.encode(request.password));
+```
+
+2. **Při přihlášení**
+   - Backend vezme hash z DB a pomocí `passwordEncoder.matches(zadaneHeslo, hashZDb)` ověří, zda zadané heslo odpovídá uloženému hashi.
+
+3. **Kde se bere PasswordEncoder?**
+   - Je to bean definovaná v konfigurační třídě:
+
+```java
+@Configuration
+public class SecurityConfig {
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+```
+- Spring ji automaticky injektuje do AuthService.
+
+**Jak bych to řekl u obhajoby:**
+> „Hesla nikdy neukládám v čitelné podobě, ale hashují se pomocí BCrypt. Při registraci se heslo zašifruje a uloží do databáze. Při přihlášení se zadané heslo ověří proti uloženému hashi. O vše se stará Spring Security a bean PasswordEncoder, kterou mám definovanou v konfiguraci.“
+
+---
 
 ## 3. Databáze
 

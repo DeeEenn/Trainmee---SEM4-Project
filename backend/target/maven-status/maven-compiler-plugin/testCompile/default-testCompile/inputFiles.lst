@@ -1,1 +1,7 @@
 /Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/test/java/com/treninkovydenik/treninkovy_denik/TreninkovyDenikApplicationTests.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/test/java/com/treninkovydenik/treninkovy_denik/service/AuthServiceTest.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/test/java/com/treninkovydenik/treninkovy_denik/service/CustomUserDetailsServiceTest.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/test/java/com/treninkovydenik/treninkovy_denik/service/ProgressServiceTest.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/test/java/com/treninkovydenik/treninkovy_denik/service/TrainerServiceTest.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/test/java/com/treninkovydenik/treninkovy_denik/service/TrainingServiceTest.java
+/Users/davidnic/Documents/Code/SEM4_PROJECT/backend/src/test/java/com/treninkovydenik/treninkovy_denik/service/UserServiceTest.java

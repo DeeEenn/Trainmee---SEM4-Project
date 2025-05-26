@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.treninkovydenik.treninkovy_denik.TreninkovyDenikApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.719 s -- in com.treninkovydenik.treninkovy_denik.TreninkovyDenikApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.310 s -- in com.treninkovydenik.treninkovy_denik.TreninkovyDenikApplicationTests
