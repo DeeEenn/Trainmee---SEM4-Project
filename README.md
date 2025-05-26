@@ -100,8 +100,8 @@ project-root/
 - State management using React
 
 ### 7.2 UI
-- Intuitivi navigation
-- Responzive layout
+- Intuitive navigation
+- Responsive layout
 - Forms with validation
 - Loading states and error handling
 

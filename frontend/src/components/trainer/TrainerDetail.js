@@ -76,7 +76,8 @@ const TrainerDetail = () => {
     const handleSendMessage = async (content) => {
         try {
             await trainerService.sendMessage(id, { content });
-            loadTrainerData();
+            const messagesResponse = await trainerService.getMessages(id);
+            setMessages(messagesResponse?.data || []);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to send message');
         }
