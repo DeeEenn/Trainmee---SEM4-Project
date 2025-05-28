@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { userService } from '../services/api';
 
+const API_URL = 'http://localhost:8080';
+
 const ProfilePage = () => {
   const [profilePicture, setProfilePicture] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -28,7 +30,7 @@ const ProfilePage = () => {
     try {
       setUploading(true);
       const response = await userService.uploadProfilePicture(file);
-      setProfilePicture(response.data);
+      setProfilePicture(`${API_URL}${response.data}`);
       setSuccessMessage('Profile picture uploaded successfully');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
@@ -42,7 +44,7 @@ const ProfilePage = () => {
     try {
       const response = await userService.getProfile();
       setUserData(response.data);
-      setProfilePicture(response.data.profilePictureUrl);
+      setProfilePicture(response.data.profilePictureUrl ? `${API_URL}${response.data.profilePictureUrl}` : null);
       setFormData({
         name: response.data.name || '',
         surname: response.data.surname || '',
@@ -109,20 +111,22 @@ const ProfilePage = () => {
           </div>
         )}
 
-        <div className="mb-8">
-          <div className="flex items-center space-x-4">
-            <div className="relative">
+        <div className="mb-12 flex flex-col items-center">
+          <div className="relative group">
+            <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-gray-200 shadow-lg">
               <img
                 src={profilePicture || '/default-avatar.png'}
                 alt="Profile"
-                className="w-24 h-24 rounded-full object-cover"
+                className="w-full h-full object-cover"
               />
-              <label
-                htmlFor="profile-picture"
-                className="absolute bottom-0 right-0 bg-gray-900 text-white p-2 rounded-full cursor-pointer hover:bg-gray-700"
-              >
+            </div>
+            <label
+              htmlFor="profile-picture"
+              className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+            >
+              <div className="text-white text-center">
                 <svg
-                  className="w-4 h-4"
+                  className="w-8 h-8 mx-auto mb-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -140,20 +144,24 @@ const ProfilePage = () => {
                     d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-              </label>
-              <input
-                type="file"
-                id="profile-picture"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-                disabled={uploading}
-              />
-            </div>
-            {uploading && (
-              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-gray-900"></div>
-            )}
+                <span className="text-sm font-medium">Změnit fotku</span>
+              </div>
+            </label>
+            <input
+              type="file"
+              id="profile-picture"
+              accept="image/*"
+              onChange={handleFileUpload}
+              className="hidden"
+              disabled={uploading}
+            />
           </div>
+          {uploading && (
+            <div className="mt-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
+              <p className="text-gray-600 mt-2">Nahrávání...</p>
+            </div>
+          )}
         </div>
 
         {isEditing ? (

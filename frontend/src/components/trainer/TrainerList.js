@@ -6,10 +6,19 @@ const TrainerList = () => {
     const [trainers, setTrainers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [favorites, setFavorites] = useState([]);
+    const currentUserId = localStorage.getItem('userId');
 
     useEffect(() => {
         loadTrainers();
-    }, []);
+        // Načtení oblíbených trenérů z localStorage pro konkrétního uživatele
+        if (currentUserId) {
+            const savedFavorites = localStorage.getItem(`favoriteTrainers_${currentUserId}`);
+            if (savedFavorites) {
+                setFavorites(JSON.parse(savedFavorites));
+            }
+        }
+    }, [currentUserId]);
 
     const loadTrainers = async () => {
         try {
@@ -20,6 +29,17 @@ const TrainerList = () => {
             setError('Unable to load trainers');
             setLoading(false);
         }
+    };
+
+    const toggleFavorite = (trainerId) => {
+        if (!currentUserId) return; // Pokud není uživatel přihlášen, nic nedělej
+        
+        const newFavorites = favorites.includes(trainerId)
+            ? favorites.filter(id => id !== trainerId)
+            : [...favorites, trainerId];
+        
+        setFavorites(newFavorites);
+        localStorage.setItem(`favoriteTrainers_${currentUserId}`, JSON.stringify(newFavorites));
     };
 
     if (loading) {
@@ -59,12 +79,26 @@ const TrainerList = () => {
                             {trainer.description && (
                                 <p className="text-gray-600 mb-4">{trainer.description}</p>
                             )}
-                            <Link
-                                to={`/trainers/${trainer.id}`}
-                                className="inline-block px-6 py-2 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
-                            >
-                                View profile
-                            </Link>
+                            <div className="flex gap-4">
+                                <Link
+                                    to={`/trainers/${trainer.id}`}
+                                    className="inline-block px-6 py-2 border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
+                                >
+                                    View profile
+                                </Link>
+                                {currentUserId && (
+                                    <button
+                                        onClick={() => toggleFavorite(trainer.id)}
+                                        className={`px-4 py-2 border ${
+                                            favorites.includes(trainer.id)
+                                                ? 'border-yellow-500 text-yellow-500 hover:bg-yellow-50'
+                                                : 'border-gray-300 text-gray-600 hover:border-gray-900 hover:text-gray-900'
+                                        } transition-colors`}
+                                    >
+                                        {favorites.includes(trainer.id) ? '★' : '☆'}
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
