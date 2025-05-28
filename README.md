@@ -15,6 +15,7 @@ A comprehensive web application for managing personal training sessions, trackin
    - [Components](#components)
    - [Services](#frontend-services)
    - [Configuration](#configuration)
+   - [Browser Storage](#browser-storage)
 4. [Database](#database)
 5. [API Endpoints](#api-endpoints)
 6. [Glossary](#glossary)
@@ -433,6 +434,19 @@ const MessageList = ({ messages, onSendMessage })
   - Send message
   - Auto-load new messages
 
+#### TrainerList
+```javascript
+const TrainerList = () => {
+```
+- Trainer list with favorites functionality
+- Features:
+  - Display all trainers
+  - Add/remove trainers to favorites
+  - User-specific favorites storage
+  - Responsive grid layout
+  - Loading states
+  - Error handling
+
 ### Frontend Services
 
 #### api.js
@@ -479,6 +493,23 @@ const API_CONFIG = {...}
   - Development
   - Production
   - Test
+
+### Browser Storage
+
+The application uses browser storage for various purposes:
+
+#### LocalStorage
+- **JWT Token**: Authentication token
+- **User ID**: Current user identification
+- **Favorite Trainers**: User-specific list of favorite trainers
+  - Stored with user-specific key: `favoriteTrainers_${userId}`
+  - Persists across sessions
+  - Automatically loads on component mount
+  - Updates in real-time when toggling favorites
+
+#### SessionStorage
+- **Temporary Data**: Session-specific information
+- **Form Data**: Temporary form state
 
 ## Database
 
@@ -625,3 +656,10 @@ const API_CONFIG = {...}
 - **Exception Handling**: Error processing
 - **Unit Testing**: Testing individual code parts
 - **Integration Testing**: Testing system part interactions
+
+### Browser Storage
+- **LocalStorage**: Persistent browser storage
+- **SessionStorage**: Session-based browser storage
+- **JWT Token**: Authentication token storage
+- **User Preferences**: User-specific settings storage
+- **Favorite Items**: User-specific favorites storage
